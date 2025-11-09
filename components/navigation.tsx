@@ -24,11 +24,7 @@ export function Navigation() {
                 key={item.label}
                 href={item.href}
                 target="_blank"
-                className={`px-3 py-1 text-sm font-medium border rounded transition-colors ${
-                  item.active
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-foreground bg-transparent hover:bg-[#006F4F] hover:text-background"
-                }`}
+                className={`px-3 py-1 text-sm font-medium border rounded transition-colors ${"border-foreground bg-transparent hover:bg-[#006F4F] hover:text-background"}`}
               >
                 {item.label}
               </Link>

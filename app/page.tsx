@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/navigation";
 import { Hero } from "@/components/hero";
 import { LatestArticle } from "@/components/latest-article";
-import { ProjectsGrid } from "@/components/projects-grid";
+// import { ProjectsGrid } from "@/components/projects-grid";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
 
