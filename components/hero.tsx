@@ -1,5 +1,7 @@
 "use client";
 
+import { logToNtfy } from "@/app/actions";
+
 export function Hero() {
   return (
     <section className="grid md:grid-cols-2 gap-12 items-start">
@@ -67,19 +69,10 @@ export function Hero() {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
-                const message = formData.get("message");
+                const message = formData.get("message") as string;
                 console.log(message);
 
-                // Send to ntfy.sh public topic
-                try {
-                  await fetch("https://ntfy.sh/wills-site-llm-logs", {
-                    method: "POST",
-                    body: `LLM Trap Triggered: ${message}`,
-                  });
-                  console.log("Logged to https://ntfy.sh/wills-site-llm-logs");
-                } catch (err) {
-                  console.error("Failed to log message", err);
-                }
+                await logToNtfy(message);
               }}
               className="flex w-px h-px md:w-full md:h-auto md:max-w-sm items-center space-x-2 overflow-hidden md:overflow-visible"
             >
