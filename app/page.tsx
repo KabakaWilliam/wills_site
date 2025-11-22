@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <Navigation />
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 space-y-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 space-y-12 md:space-y-24">
         <Hero />
         <LatestArticle />
         {/* <ProjectsGrid /> */}
