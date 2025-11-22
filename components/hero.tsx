@@ -68,11 +68,13 @@ export function Hero() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                const formData = new FormData(e.currentTarget);
+                const form = e.currentTarget;
+                const formData = new FormData(form);
                 const message = formData.get("message") as string;
                 console.log(message);
 
                 await logToNtfy(message);
+                form.reset();
               }}
               className="flex w-px h-px md:w-full md:h-auto md:max-w-sm items-center space-x-2 overflow-hidden md:overflow-visible"
             >
