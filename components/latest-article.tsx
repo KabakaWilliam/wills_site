@@ -9,12 +9,12 @@ export function LatestArticle() {
         <a
           href="https://arxiv.org/abs/2602.09924"
           target="_blank"
-          className="block"
+          className="block group"
         >
           <div className="grid md:grid-cols-2 gap-8 pb-10 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-lg mb-3 hover:text-[#006F4F]">
+                <h3 className="font-bold text-lg mb-3 group-hover:text-[#006F4F] transition-colors">
                   → LLMs Encode Their Failures: Predicting Success from
                   Pre-Generation Activations
                 </h3>
@@ -42,12 +42,12 @@ export function LatestArticle() {
         <a
           href="https://arxiv.org/abs/2510.18147"
           target="_blank"
-          className="block"
+          className="block group"
         >
           <div className="grid md:grid-cols-2 gap-8 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-lg mb-3 hover:text-[#006F4F]">
+                <h3 className="font-bold text-lg mb-3 group-hover:text-[#006F4F] transition-colors">
                   → LLMs Encode How Difficult Problems Are
                 </h3>
                 <p className="text-sm text-muted-foreground">
