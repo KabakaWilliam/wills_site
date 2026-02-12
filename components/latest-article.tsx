@@ -6,34 +6,70 @@ export function LatestArticle() {
           <span>Research</span>
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-bold text-lg mb-3 cursor-pointer hover:text-[#006F4F]">
-                →{" "}
-                <a href="https://arxiv.org/abs/2510.18147" target="_blank">
-                  LLMs Encode How Difficult Problems Are
-                </a>
-              </h3>
-              <p className="text-sm text-muted-foreground ">
-                We show that LLMs linearly represent the difficulty of math and
-                coding problems.
-              </p>
+        <a
+          href="https://arxiv.org/abs/2602.09924"
+          target="_blank"
+          className="block"
+        >
+          <div className="grid md:grid-cols-2 gap-8 pb-10 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-lg mb-3 hover:text-[#006F4F]">
+                  → LLMs Encode Their Failures: Predicting Success from
+                  Pre-Generation Activations
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  LLMs' internal representations can predict problem difficulty
+                  and enable efficient inference routing that reduces costs
+                  while maintaining performance.
+                </p>
+              </div>
+
+              <div className="text-xs font-mono text-muted-foreground">
+                10th February, 2026
+              </div>
             </div>
 
-            <div className="text-xs font-mono text-muted-foreground">
-              20th October, 2025
+            <div className="rounded bg-card h-64 md:h-auto flex items-center justify-center font-mono text-muted-foreground">
+              <img
+                src="/MATH_paretto.png"
+                alt=""
+                className="max-w-xs md:max-w-sm object-contain h-64"
+              />
+            </div>
+          </div>
+        </a>
+        <a
+          href="https://arxiv.org/abs/2510.18147"
+          target="_blank"
+          className="block"
+        >
+          <div className="grid md:grid-cols-2 gap-8 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-lg mb-3 hover:text-[#006F4F]">
+                  → LLMs Encode How Difficult Problems Are
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  We show that LLMs linearly represent the difficulty of math
+                  and coding problems.
+                </p>
+              </div>
+
+              <div className="text-xs font-mono text-muted-foreground">
+                20th October, 2025
+              </div>
             </div>
 
-            {/* <button className="px-4 py-2 bg-primary text-primary-foreground rounded font-medium text-sm hover:opacity-90 transition-opacity">
-              View
-            </button> */}
+            <div className="rounded bg-card h-30 md:h-auto flex items-center justify-center font-mono text-muted-foreground">
+              <img
+                src="/full_probe_comparison_scale.png"
+                alt=""
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
-
-          <div className=" rounded bg-card h-64 md:h-auto flex items-center justify-center font-mono text-muted-foreground cursor-pointer">
-            <img src="/full_probe_comparison_scale.png" alt="" />
-          </div>
-        </div>
+        </a>
       </div>
 
       {/* <div className="flex justify-center pt-4">
