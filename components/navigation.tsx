@@ -21,7 +21,11 @@ export function Navigation() {
               <a href="#contact">Contact</a>
             </li>
             <li>
-              <a href="/William_Gitta_Lugoloobi_CV.pdf" className="nav-cv">
+              <a
+                href="/William_Gitta_Lugoloobi_CV.pdf"
+                className="nav-cv"
+                target="_blank"
+              >
                 CV ↗
               </a>
             </li>
