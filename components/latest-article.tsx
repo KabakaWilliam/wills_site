@@ -1,82 +1,70 @@
+"use client";
+
+import { FadeIn } from "@/components/fade-in";
+
 export function LatestArticle() {
   return (
-    <section className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-          <span>Research</span>
-        </h2>
+    <section id="research" className="section">
+      <div className="container">
+        <p className="section-label">Research</p>
 
-        <a
-          href="https://arxiv.org/abs/2602.09924"
-          target="_blank"
-          className="block group"
-        >
-          <div className="grid md:grid-cols-2 gap-8 pb-10 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-bold text-lg mb-3 group-hover:text-[#006F4F] transition-colors">
-                  → LLMs Encode Their Failures: Predicting Success from
-                  Pre-Generation Activations
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  LLMs' internal representations can predict problem difficulty
-                  and enable efficient inference routing that reduces costs
-                  while maintaining performance.
-                </p>
+        <FadeIn>
+          <a
+            href="https://arxiv.org/abs/2602.09924"
+            target="_blank"
+            className="paper"
+          >
+            <div>
+              <div className="paper-title">
+                LLMs Encode Their Failures: Predicting Success from
+                Pre-Generation Activations
               </div>
-
-              <div className="text-xs font-mono text-muted-foreground">
-                10th February, 2026
+              <p className="paper-abstract">
+                Language models&apos; internal representations contain signal
+                about whether they&apos;ll succeed on a task — before generation
+                begins. We show this can be extracted to route inference
+                efficiently, reducing costs while maintaining performance.
+              </p>
+              <div className="paper-meta">
+                arXiv:2602.09924 &nbsp;·&nbsp; mechanistic interpretability
+                &nbsp;·&nbsp; inference routing
               </div>
             </div>
-
-            <div className="rounded bg-card h-64 md:h-auto flex items-center justify-center font-mono text-muted-foreground">
-              <img
-                src="/MATH_paretto.png"
-                alt=""
-                className="max-w-xs md:max-w-sm object-contain h-64"
-              />
+            <div>
+              <div className="paper-date">Feb 2026</div>
+              <span className="paper-arrow">→</span>
             </div>
-          </div>
-        </a>
-        <a
-          href="https://arxiv.org/abs/2510.18147"
-          target="_blank"
-          className="block group"
-        >
-          <div className="grid md:grid-cols-2 gap-8 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-bold text-lg mb-3 group-hover:text-[#006F4F] transition-colors">
-                  → LLMs Encode How Difficult Problems Are
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  We show that LLMs linearly represent the difficulty of math
-                  and coding problems.
-                </p>
-              </div>
+          </a>
+        </FadeIn>
 
-              <div className="text-xs font-mono text-muted-foreground">
-                20th October, 2025
+        <FadeIn>
+          <a
+            href="https://arxiv.org/abs/2510.18147"
+            target="_blank"
+            className="paper"
+          >
+            <div>
+              <div className="paper-title">
+                LLMs Encode How Difficult Problems Are
+              </div>
+              <p className="paper-abstract">
+                LLMs linearly represent the difficulty of math and coding
+                problems in their activation space. This geometric structure has
+                implications for adaptive inference, curriculum learning, and
+                understanding model confidence.
+              </p>
+              <div className="paper-meta">
+                arXiv:2510.18147 &nbsp;·&nbsp; representation learning
+                &nbsp;·&nbsp; probing
               </div>
             </div>
-
-            <div className="rounded bg-card h-30 md:h-auto flex items-center justify-center font-mono text-muted-foreground">
-              <img
-                src="/full_probe_comparison_scale.png"
-                alt=""
-                className="w-full h-full object-contain"
-              />
+            <div>
+              <div className="paper-date">Oct 2025</div>
+              <span className="paper-arrow">→</span>
             </div>
-          </div>
-        </a>
+          </a>
+        </FadeIn>
       </div>
-
-      {/* <div className="flex justify-center pt-4">
-        <button className="px-4 py-2 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors rounded font-medium text-sm">
-          View More
-        </button>
-      </div> */}
     </section>
   );
 }
