@@ -10,7 +10,7 @@ export function TrajectoryKit() {
         <h2>TrajectoryKit</h2>
         <p className="tk-intro">
           A <strong>local-first agentic framework</strong> for running AI agents
-          on your own hardware — no API keys required. Built on the idea that{" "}
+          on your own hardware (BYOK). Built on the idea that{" "}
           <strong>full observability is prerequisite to safety</strong>: every
           turn, reasoning chain, tool call, and sub-agent is captured in a
           structured trace and rendered as a readable HTML report.

@@ -326,6 +326,7 @@ h2 {
   border-radius: 50%;
   background: var(--border);
   display: inline-block;
+  background-color: #2d8a56;
 }
 
 .trace-header-right {
