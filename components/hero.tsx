@@ -14,7 +14,7 @@ export function Hero() {
               <em>William</em>
             </h1>
             <p className="hero-bio">
-              I&apos;m a 2nd-year DPhil student at the{" "}
+              I&apos;m a 2nd-year PhD student at the{" "}
               <a href="https://www.oii.ox.ac.uk/" target="_blank">
                 Oxford Internet Institute
               </a>
