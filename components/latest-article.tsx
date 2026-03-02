@@ -26,7 +26,7 @@ export function LatestArticle() {
                 efficiently, reducing costs while maintaining performance.
               </p>
               <div className="paper-meta">
-                (under review, 2026) &nbsp;·&nbsp; mechanistic interpretability
+                (ICLR Workshop, 2026) &nbsp;·&nbsp; mechanistic interpretability
                 &nbsp;·&nbsp; inference routing
               </div>
             </div>
