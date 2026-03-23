@@ -13,7 +13,10 @@ export default async function BlogPage() {
         <section className="blog-section">
           <div className="blog-header">
             <h1>Blog</h1>
-            <p>Thoughts on building, design, and technology</p>
+            <p>
+              Writing on machine learning, agentic systems, and things I am
+              figuring out.
+            </p>
           </div>
           <BlogList posts={posts} />
         </section>
