@@ -12,13 +12,16 @@ export function Navigation() {
         <nav>
           <ul className="header-nav">
             <li>
-              <a href="#research">Research</a>
+              <a href="/#research">Research</a>
             </li>
             <li>
-              <a href="#projects">Projects</a>
+              <a href="/#projects">Projects</a>
             </li>
             <li>
-              <a href="#contact">Contact</a>
+              <Link href="/blog">Blog</Link>
+            </li>
+            <li>
+              <a href="/#contact">Contact</a>
             </li>
             <li>
               <a

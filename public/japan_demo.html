@@ -1,0 +1,3792 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dispatch Trace — a6420e44</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+      :root {
+        --white: #ffffff;
+        --off: #f7f7f5;
+        --border: #e4e4e0;
+        --text: #222220;
+        --text-mid: #666662;
+        --text-light: #999994;
+        --accent: #2a5caa;
+        --accent-bg: #f0f4fb;
+        --success: #2d8a56;
+        --warn: #c9860a;
+        --error: #c0392b;
+        --depth-0: #e4e4e0;
+        --depth-1: #c4c8f0;
+        --depth-2: #c4e0c8;
+        --purple: #7c3aed;
+        --serif: "Fraunces", Georgia, serif;
+        --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--off);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 1.6;
+        font-weight: 300;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Layout ── */
+      .viewer {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        max-width: 1100px;
+        margin: 0 auto;
+        min-height: 100vh;
+      }
+
+      /* ── Sidebar / Timeline ── */
+      .sidebar {
+        border-right: 1px solid var(--border);
+        background: var(--white);
+        padding: 24px 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 12px;
+      }
+      .sidebar-title {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-mid);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .sidebar-title .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--success);
+        display: inline-block;
+      }
+      .sidebar-meta {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        margin-top: 8px;
+        line-height: 1.6;
+      }
+
+      .timeline {
+        list-style: none;
+      }
+      .tl-item {
+        position: relative;
+        padding: 8px 20px 8px 36px;
+        cursor: pointer;
+        transition: background 0.12s;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-mid);
+        border-left: 2px solid transparent;
+      }
+      .tl-item:hover {
+        background: var(--off);
+      }
+      .tl-item.active {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-left-color: var(--accent);
+      }
+      .tl-item::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        background: var(--white);
+      }
+      .tl-item.active::before {
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+      .tl-item.sub {
+        padding-left: 50px;
+        font-size: 10px;
+      }
+      .tl-item.sub::before {
+        left: 30px;
+        width: 5px;
+        height: 5px;
+      }
+      .tl-item.sub2 {
+        padding-left: 64px;
+        font-size: 10px;
+      }
+      .tl-item.sub2::before {
+        left: 44px;
+        width: 4px;
+        height: 4px;
+      }
+      .tl-label {
+        display: block;
+        font-size: 9px;
+        color: var(--text-light);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 16px 20px 6px;
+      }
+
+      /* ── Main content ── */
+      .main {
+        padding: 32px 40px;
+        overflow-y: auto;
+      }
+
+      /* ── Prompt banner ── */
+      .prompt-banner {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+      }
+      .prompt-label {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 6px;
+      }
+      .prompt-text {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      /* ── Trace header ── */
+      .trace-header {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 28px;
+      }
+      .trace-header-bar {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .trace-header-left {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-mid);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .trace-header-left .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+      }
+      .trace-header-right {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+      }
+      .trace-stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+      }
+      .trace-stat {
+        padding: 18px 16px;
+        border-right: 1px solid var(--border);
+        text-align: center;
+      }
+      .trace-stat:last-child {
+        border-right: none;
+      }
+      .trace-stat-val {
+        font-family: var(--serif);
+        font-size: 26px;
+        font-weight: 300;
+        color: var(--text);
+        display: block;
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+      .trace-stat-lbl {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      /* ── Token ratio bar (in stats header) ── */
+      .token-ratio-bar {
+        display: flex;
+        height: 4px;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 10px;
+        background: var(--off);
+      }
+      .token-ratio-in {
+        background: var(--accent);
+      }
+      .token-ratio-out {
+        background: var(--success);
+      }
+      .token-ratio-legend {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 6px;
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-light);
+      }
+      .token-ratio-legend span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .token-ratio-legend .swatch {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+      }
+
+      /* ── Turn cards ── */
+      .turn-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: box-shadow 0.15s;
+      }
+      .turn-card:target,
+      .turn-card.highlight {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+      .turn-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.12s;
+      }
+      .turn-header:hover {
+        background: var(--off);
+      }
+      .turn-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .turn-badge {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 3px;
+        letter-spacing: 0.03em;
+      }
+      .badge-root {
+        background: #f0f0ee;
+        color: var(--text-mid);
+      }
+      .badge-sub {
+        background: var(--depth-1);
+        color: #4a4aa0;
+      }
+      .badge-sub2 {
+        background: var(--depth-2);
+        color: #2d6a3e;
+      }
+      .badge-tool {
+        background: #fef3cd;
+        color: #856404;
+      }
+      .badge-reasoning {
+        background: #f3e8ff;
+        color: var(--purple);
+      }
+      .badge-error {
+        background: #fde8e8;
+        color: var(--error);
+      }
+      .turn-title {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .turn-meta {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .chevron {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        color: var(--text-light);
+        transition: transform 0.2s;
+      }
+      .turn-card.open .chevron {
+        transform: rotate(180deg);
+      }
+
+      .turn-body {
+        display: none;
+        border-top: 1px solid var(--border);
+      }
+      .turn-card.open .turn-body {
+        display: block;
+      }
+
+      /* ── Sections inside a turn ── */
+      .turn-section {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .turn-section:last-child {
+        border-bottom: none;
+      }
+      .turn-section-label {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-light);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      /* ── Reasoning chain ── */
+      .reasoning {
+        font-size: 13px;
+        color: var(--text-mid);
+        line-height: 1.8;
+        white-space: pre-wrap;
+        font-family: var(--sans);
+      }
+
+      /* ── Tool call block ── */
+      .tool-block {
+        background: var(--off);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+      .tool-block:last-child {
+        margin-bottom: 0;
+      }
+      .tool-block-header {
+        padding: 8px 14px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-mid);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .tool-block-header:hover {
+        background: #f0f0ee;
+      }
+      .tool-fn {
+        color: var(--accent);
+      }
+      .tool-block-body {
+        padding: 12px 14px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-mid);
+        line-height: 1.6;
+        display: none;
+      }
+      .tool-block.open .tool-block-body {
+        display: block;
+      }
+      .tool-args-pre,
+      .tool-output-pre {
+        background: var(--white);
+        padding: 10px;
+        border-radius: 3px;
+        font-family: var(--mono);
+        font-size: 11px;
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        border: 1px solid var(--border);
+        margin-top: 6px;
+      }
+      .tool-result {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+        color: var(--success);
+      }
+      .tool-error {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+        color: var(--error);
+      }
+
+      /* ── Verifier metadata block ── */
+      .verifier-block {
+        margin-top: 10px;
+        padding: 10px 14px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .verifier-block.approved {
+        background: #f0faf0;
+        border-color: var(--success);
+      }
+      .verifier-block.rejected {
+        background: #fdf0f0;
+        border-color: var(--error);
+      }
+      .verifier-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .verifier-badge.approved {
+        background: var(--success);
+        color: white;
+      }
+      .verifier-badge.rejected {
+        background: var(--error);
+        color: white;
+      }
+      .verifier-detail {
+        margin-top: 6px;
+        padding: 8px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 11px;
+        color: var(--text-mid);
+      }
+      .verifier-section-label {
+        font-size: 9px;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 8px;
+        margin-bottom: 4px;
+      }
+
+      /* ── Spot-check metadata block ── */
+      .spotcheck-block {
+        margin-top: 8px;
+        padding: 10px 14px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .spotcheck-block.passed {
+        background: #f0faf0;
+        border-color: var(--success);
+      }
+      .spotcheck-block.failed {
+        background: #fdf0f0;
+        border-color: var(--error);
+      }
+      .spotcheck-block.challenged {
+        background: #fff8f0;
+        border-color: #e67e22;
+      }
+      .spotcheck-block.justified {
+        background: #f0f6fa;
+        border-color: #3498db;
+      }
+      .spotcheck-block.skipped {
+        background: #fffcf0;
+        border-color: #f1c40f;
+      }
+      .spotcheck-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .spotcheck-badge.passed {
+        background: var(--success);
+        color: white;
+      }
+      .spotcheck-badge.failed {
+        background: var(--error);
+        color: white;
+      }
+      .spotcheck-badge.challenged {
+        background: #e67e22;
+        color: white;
+      }
+      .spotcheck-badge.justified {
+        background: #3498db;
+        color: white;
+      }
+      .spotcheck-badge.skipped {
+        background: #f1c40f;
+        color: #333;
+      }
+      .spotcheck-claims {
+        margin-top: 6px;
+        padding: 8px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        font-size: 11px;
+      }
+      .spotcheck-claim-item {
+        padding: 4px 0;
+        border-bottom: 1px solid #eee;
+        color: var(--text-mid);
+      }
+      .spotcheck-claim-item:last-child {
+        border-bottom: none;
+      }
+      .spotcheck-toggle {
+        cursor: pointer;
+        color: var(--accent);
+        font-size: 10px;
+        text-decoration: underline;
+        margin-top: 4px;
+        display: inline-block;
+      }
+
+      /* ── Verification pipeline overview ── */
+      .verify-pipeline {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin: 10px 0 6px 0;
+        font-family: var(--mono);
+        font-size: 10px;
+      }
+      .verify-stage {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+      .verify-stage.passed {
+        background: #e8f5e9;
+        border-color: var(--success);
+      }
+      .verify-stage.failed {
+        background: #ffebee;
+        border-color: var(--error);
+      }
+      .verify-stage.skipped {
+        background: #fff8e1;
+        border-color: #f1c40f;
+      }
+      .verify-stage.empty {
+        background: #f5f5f5;
+        border-color: #ccc;
+        color: #999;
+      }
+      .verify-stage-icon {
+        font-size: 12px;
+      }
+      .verify-arrow {
+        color: var(--text-light);
+        font-size: 14px;
+        padding: 0 4px;
+      }
+      .claim-evidence-card {
+        margin: 4px 0;
+        padding: 8px 10px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+        background: var(--white);
+        font-size: 11px;
+      }
+      .claim-evidence-card.supported {
+        border-left: 3px solid var(--success);
+      }
+      .claim-evidence-card.contradicted {
+        border-left: 3px solid var(--error);
+      }
+      .claim-evidence-card.insufficient {
+        border-left: 3px solid #f1c40f;
+      }
+      .claim-evidence-card.fabricated {
+        border-left: 3px solid #9b59b6;
+      }
+      .claim-evidence-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+      .claim-assess-badge {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .claim-assess-badge.supported {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .claim-assess-badge.contradicted {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .claim-assess-badge.insufficient {
+        background: #fff8e1;
+        color: #f57f17;
+      }
+      .claim-assess-badge.fabricated {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      .claim-assess-badge.degraded {
+        background: #f5f5f5;
+        color: #999;
+      }
+      .claim-source-url {
+        font-size: 9px;
+        color: var(--accent);
+        word-break: break-all;
+        margin-bottom: 4px;
+      }
+      .citation-audit-block {
+        margin-top: 8px;
+        padding: 10px 14px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .citation-audit-block.passed {
+        background: #f0faf0;
+        border-color: var(--success);
+      }
+      .citation-audit-block.failed {
+        background: #fdf0f0;
+        border-color: var(--error);
+      }
+
+      /* ── Draft card ── */
+      .draft-card {
+        margin-top: 10px;
+        padding: 14px 16px;
+        border-radius: 4px;
+        border: 1px solid #c8d6e5;
+        background: #f8fafe;
+        font-family: var(--sans);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .draft-card.published {
+        border-color: var(--success);
+        background: #f0faf0;
+      }
+      .draft-card.rejected {
+        border-color: var(--error);
+        background: #fdf8f8;
+      }
+      .draft-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        font-family: var(--mono);
+      }
+      .draft-badge.version {
+        background: #c8d6e5;
+        color: #2c3e50;
+      }
+      .draft-badge.published {
+        background: var(--success);
+        color: white;
+      }
+      .draft-badge.rejected {
+        background: var(--error);
+        color: white;
+      }
+      .draft-meta {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        margin-bottom: 8px;
+      }
+      .draft-content {
+        padding: 10px 12px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 12px;
+        color: var(--text);
+        line-height: 1.65;
+      }
+      .draft-toggle {
+        cursor: pointer;
+        color: var(--accent);
+        font-size: 10px;
+        text-decoration: underline;
+        margin-top: 6px;
+        display: inline-block;
+        font-family: var(--mono);
+      }
+
+      /* ── Sub-agent spawn ── */
+      .spawn-card {
+        border-left: 3px solid var(--depth-1);
+        padding: 12px 16px;
+        background: #fafaff;
+        border-radius: 0 3px 3px 0;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+      .spawn-card:last-child {
+        margin-bottom: 0;
+      }
+      .spawn-card.depth2 {
+        border-left-color: var(--depth-2);
+        background: #f7fbf7;
+      }
+      .spawn-card:hover {
+        background: #f0f0ff;
+      }
+      .spawn-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        margin-bottom: 4px;
+      }
+      .spawn-task {
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      /* ── Output / response ── */
+      .output-block {
+        background: var(--off);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 14px 16px;
+        font-size: 13px;
+        color: var(--text-mid);
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* ── Inline images ── */
+      .tc-img {
+        margin-top: 8px;
+      }
+      .tc-img img {
+        max-width: 100%;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+      }
+
+      /* ── Tokens pill (dual segment) ── */
+      .tokens-pill {
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--mono);
+        font-size: 10px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .tokens-pill .tok-in {
+        padding: 2px 6px 2px 7px;
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .tokens-pill .tok-out {
+        padding: 2px 7px 2px 6px;
+        background: #edf7f0;
+        color: var(--success);
+      }
+      .tokens-pill .tok-sep {
+        width: 1px;
+        background: var(--border);
+        align-self: stretch;
+      }
+
+      /* ── Status indicator ── */
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .status-ok .status-dot {
+        background: var(--success);
+      }
+      .status-warn .status-dot {
+        background: var(--warn);
+      }
+      .status-err .status-dot {
+        background: var(--error);
+      }
+
+      /* ── Final response ── */
+      .final-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 24px;
+      }
+      .final-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--success);
+      }
+      .final-body {
+        padding: 16px 20px;
+      }
+
+      /* ── Rendered markdown in final response ── */
+      .final-rendered {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      .final-rendered h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 24px 0 12px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+      }
+      .final-rendered h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 20px 0 10px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 6px;
+      }
+      .final-rendered h3 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 16px 0 8px;
+      }
+      .final-rendered p {
+        margin: 8px 0;
+      }
+      .final-rendered ul,
+      .final-rendered ol {
+        margin: 8px 0;
+        padding-left: 24px;
+      }
+      .final-rendered li {
+        margin: 4px 0;
+      }
+      .final-rendered a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .final-rendered a:hover {
+        text-decoration: underline;
+      }
+      .final-rendered code {
+        background: var(--off);
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      .final-rendered pre {
+        background: var(--off);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 12px;
+        overflow-x: auto;
+      }
+      .final-rendered pre code {
+        background: none;
+        padding: 0;
+      }
+      .final-rendered blockquote {
+        border-left: 3px solid var(--accent);
+        margin: 8px 0;
+        padding: 4px 16px;
+        color: var(--text-mid);
+      }
+      .final-rendered table {
+        border-collapse: collapse;
+        margin: 12px 0;
+        width: 100%;
+        font-size: 13px;
+      }
+      .final-rendered th,
+      .final-rendered td {
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        text-align: left;
+      }
+      .final-rendered th {
+        background: var(--off);
+        font-weight: 600;
+      }
+      .final-rendered strong {
+        font-weight: 600;
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 768px) {
+        .viewer {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: relative;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .main {
+          padding: 24px 20px;
+        }
+        .trace-stats {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* ── Chain analysis panel ── */
+      .chain-panel {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+      .chain-panel-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+      }
+      .chain-panel-header:hover {
+        background: var(--off);
+      }
+      .chain-panel-title {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text-mid);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .chain-panel-body {
+        padding: 20px;
+      }
+      .chain-panel-body.collapsed {
+        display: none;
+      }
+
+      /* Chain steps */
+      .chain-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .chain-step {
+        position: relative;
+        padding: 12px 16px 12px 44px;
+        margin-bottom: 8px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--off);
+        transition: all 0.15s;
+      }
+      .chain-step:last-child {
+        margin-bottom: 0;
+      }
+      .chain-step::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: var(--white);
+      }
+      .chain-step.resolved {
+        border-color: var(--success);
+        background: #f0faf0;
+      }
+      .chain-step.resolved::before {
+        border-color: var(--success);
+        background: var(--success);
+      }
+      .chain-step.unlocked {
+        border-color: var(--accent);
+        background: var(--accent-bg);
+      }
+      .chain-step.unlocked::before {
+        border-color: var(--accent);
+        background: var(--accent-bg);
+      }
+      .chain-step.locked {
+        opacity: 0.65;
+      }
+      .chain-step.locked::before {
+        border-color: var(--text-light);
+        background: var(--off);
+      }
+
+      .chain-step-num {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .chain-step-lookup {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .chain-step-dep {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        margin-top: 4px;
+      }
+      .chain-step-result {
+        margin-top: 6px;
+        padding: 6px 10px;
+        border-radius: 3px;
+        background: var(--white);
+        border: 1px solid var(--success);
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--success);
+      }
+      /* Connector line between steps */
+      .chain-step-connector {
+        position: absolute;
+        left: 24px;
+        top: -8px;
+        width: 2px;
+        height: 8px;
+        background: var(--border);
+      }
+      .chain-step:first-child .chain-step-connector {
+        display: none;
+      }
+
+      /* Parallel tasks */
+      .chain-parallel {
+        margin-top: 16px;
+      }
+      .chain-parallel-title {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .chain-parallel-item {
+        padding: 8px 12px;
+        background: var(--off);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: var(--text-mid);
+      }
+      .chain-parallel-item:last-child {
+        margin-bottom: 0;
+      }
+
+      /* No-chain badge */
+      .chain-no-chain {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-mid);
+        padding: 8px 0;
+      }
+      .chain-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .chain-badge.has-chain {
+        background: #e8f0fe;
+        color: var(--accent);
+      }
+      .chain-badge.no-chain {
+        background: #f0f0ee;
+        color: var(--text-mid);
+      }
+
+      /* ── Inline chain progress tracker (per root turn) ── */
+      .chain-progress {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        padding: 10px 16px;
+        margin: 0 -16px 8px;
+        background: var(--off);
+        border-bottom: 1px solid var(--border);
+        border-radius: 0;
+      }
+      .chain-progress-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-light);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-right: 4px;
+      }
+      .chain-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        background: var(--white);
+        transition: all 0.3s ease;
+      }
+      .chain-pill.locked {
+        color: var(--text-light);
+        opacity: 0.6;
+      }
+      .chain-pill.unlocked {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--accent-bg);
+      }
+      .chain-pill.resolved {
+        color: var(--success);
+        border-color: var(--success);
+        background: #f0faf0;
+      }
+      .chain-pill.just-resolved {
+        color: var(--success);
+        border-color: var(--success);
+        background: #d4edda;
+        font-weight: 600;
+        box-shadow: 0 0 0 2px rgba(45, 138, 86, 0.2);
+        animation: chain-resolve-pulse 0.6s ease-out;
+      }
+      @keyframes chain-resolve-pulse {
+        0% {
+          transform: scale(1.15);
+          box-shadow: 0 0 0 4px rgba(45, 138, 86, 0.3);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 2px rgba(45, 138, 86, 0.2);
+        }
+      }
+      .chain-pill.contested {
+        color: var(--error);
+        border-color: var(--error);
+        background: #fde8e8;
+        font-weight: 600;
+        box-shadow: 0 0 0 2px rgba(204, 51, 51, 0.2);
+        animation: chain-contest-pulse 0.6s ease-out;
+        text-decoration: line-through;
+      }
+      @keyframes chain-contest-pulse {
+        0% {
+          transform: scale(1.15);
+          box-shadow: 0 0 0 4px rgba(204, 51, 51, 0.3);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 2px rgba(204, 51, 51, 0.2);
+        }
+      }
+
+      /* ── Collapsible sub-agent groups ── */
+      .sub-agent-group {
+        margin: -4px 0 16px 28px;
+        border-left: 3px solid var(--depth-1);
+        border-radius: 0 4px 4px 0;
+        position: relative;
+      }
+      /* Connecting line from root card down to the sub-agent toggle */
+      .sub-agent-group::before {
+        content: "";
+        position: absolute;
+        left: -17px;
+        top: -12px;
+        width: 14px;
+        height: 24px;
+        border-left: 2px solid var(--depth-1);
+        border-bottom: 2px solid var(--depth-1);
+        border-radius: 0 0 0 6px;
+      }
+      .sub-agent-group-summary {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        cursor: pointer;
+        user-select: none;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-mid);
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-left: none;
+        border-radius: 0 4px 4px 0;
+        transition: background 0.15s;
+      }
+      .sub-agent-group-summary:hover {
+        background: var(--off);
+      }
+      .sub-agent-group-summary::-webkit-details-marker {
+        display: none;
+      }
+      .sub-agent-group-summary::marker {
+        display: none;
+        content: "";
+      }
+      .sub-agent-group-icon {
+        display: inline-block;
+        transition: transform 0.2s ease;
+        font-size: 9px;
+        color: var(--text-light);
+      }
+      .sub-agent-group[open] .sub-agent-group-icon {
+        transform: rotate(90deg);
+      }
+      .sub-agent-group-body {
+        padding: 8px 0 8px 8px;
+        background: linear-gradient(
+          90deg,
+          rgba(196, 200, 240, 0.08) 0%,
+          transparent 50%
+        );
+      }
+      .sub-agent-group-body .turn-card {
+        margin-bottom: 8px;
+        border-left: 2px solid var(--depth-1);
+        font-size: 14px;
+      }
+
+      /* ── Timeline sidebar enhancements ── */
+      .tl-tool {
+        font-size: 9px;
+        color: var(--text-light);
+        display: block;
+        margin-top: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+      .tl-sub-count {
+        display: inline-block;
+        padding: 0 4px;
+        border-radius: 8px;
+        background: var(--depth-1);
+        color: var(--text-mid);
+        font-size: 9px;
+        font-weight: 600;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+      .tl-chain-dots {
+        display: inline-flex;
+        gap: 2px;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+      .tl-chain-dot {
+        font-size: 8px;
+        line-height: 1;
+      }
+      .tl-chain-dot.resolved {
+        color: var(--success);
+      }
+      .tl-chain-dot.pending {
+        color: var(--text-light);
+      }
+
+      /* ── Rubric panel ── */
+      .rubric-panel {
+        background: var(--white);
+        border: 1px solid #b8c8e8;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+      .rubric-panel-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #b8c8e8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+        background: #f0f4fb;
+      }
+      .rubric-panel-header:hover {
+        background: #e8eef8;
+      }
+      .rubric-panel-title {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .rubric-panel-body {
+        padding: 20px;
+      }
+      .rubric-panel-body.collapsed {
+        display: none;
+      }
+      .rubric-section-label {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--text-light);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin: 12px 0 6px;
+      }
+      .rubric-section-label:first-child {
+        margin-top: 0;
+      }
+      .rubric-item {
+        padding: 5px 10px;
+        background: var(--off);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: var(--text-mid);
+        font-family: var(--mono);
+      }
+      .rubric-item .rubric-id {
+        color: var(--accent);
+        font-weight: 600;
+        margin-right: 6px;
+      }
+      .rubric-depth {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .rubric-depth-pill {
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid #b8c8e8;
+        font-family: var(--mono);
+      }
+      .rubric-trap {
+        padding: 5px 10px;
+        background: #fff8f0;
+        border: 1px solid #f0c080;
+        border-radius: 3px;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: #854d0e;
+        font-family: var(--mono);
+      }
+
+      /* ── Critique panel (inside Stage 1 verifier block) ── */
+      .critique-block {
+        margin-top: 10px;
+        padding: 12px 16px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .critique-block.publish {
+        background: #f0faf0;
+        border-color: var(--success);
+      }
+      .critique-block.revise {
+        background: #fdf8f0;
+        border-color: var(--warn);
+      }
+      .critique-scores {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .critique-score-item {
+        text-align: center;
+      }
+      .critique-score-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-light);
+        margin-bottom: 4px;
+        display: block;
+      }
+      .critique-score-bar-wrap {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--off);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-bottom: 3px;
+      }
+      .critique-score-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.4s ease;
+      }
+      .critique-score-bar.high {
+        background: var(--success);
+      }
+      .critique-score-bar.mid {
+        background: var(--warn);
+      }
+      .critique-score-bar.low {
+        background: var(--error);
+      }
+      .critique-score-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        font-family: var(--serif);
+      }
+      .critique-items {
+        margin: 6px 0;
+      }
+      .critique-item {
+        padding: 4px 8px;
+        margin-bottom: 3px;
+        border-radius: 3px;
+        font-size: 11px;
+        line-height: 1.4;
+        border: 1px solid var(--border);
+        background: var(--white);
+        color: var(--text-mid);
+      }
+      .critique-item .cid {
+        color: var(--accent);
+        font-weight: 600;
+        margin-right: 4px;
+      }
+      .risky-badge {
+        display: inline-block;
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-right: 5px;
+        letter-spacing: 0.05em;
+      }
+      .risky-badge.high {
+        background: var(--error);
+        color: white;
+      }
+      .risky-badge.medium {
+        background: var(--warn);
+        color: white;
+      }
+      .risky-badge.low {
+        background: #f1c40f;
+        color: #333;
+      }
+      .critique-task-list {
+        margin: 6px 0;
+        counter-reset: task-counter;
+      }
+      .critique-task {
+        display: flex;
+        gap: 8px;
+        padding: 5px 8px;
+        margin-bottom: 3px;
+        border-radius: 3px;
+        border: 1px solid #b8c8e8;
+        background: var(--accent-bg);
+        font-size: 11px;
+        color: var(--accent);
+        counter-increment: task-counter;
+      }
+      .critique-task::before {
+        content: counter(task-counter) ".";
+        font-weight: 700;
+        min-width: 14px;
+        flex-shrink: 0;
+      }
+      .critique-verdict-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .critique-verdict-badge.publish {
+        background: var(--success);
+        color: white;
+      }
+      .critique-verdict-badge.revise {
+        background: var(--warn);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewer">
+      <!-- ── Sidebar ── -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <span class="dot"></span> trajectorykit
+          </div>
+          <div class="sidebar-meta">
+            openai/gpt-oss-20b<br />2026-03-14T11:23:49.903967
+          </div>
+        </div>
+        <ul class="timeline">
+          <li class="tl-item" data-target="card-1">
+            Turn 1 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-18">
+            Turn 2 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-34">
+            Turn 3 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-51">
+            Turn 4 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-68">
+            Turn 5 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-84">
+            Turn 6 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-101">
+            Turn 7 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-102">
+            Turn 8 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-118">
+            Turn 9 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-134">
+            Turn 10 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-150">
+            Turn 11 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-151">Turn 12</li>
+          <li class="tl-item" data-target="card-152">
+            Turn 13 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-175">
+            Turn 14 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-192">
+            Turn 15 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-193">
+            Turn 16 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-210">
+            Turn 17 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-211">
+            Turn 18 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-212">
+            Turn 19 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-213">
+            Turn 20 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-214">
+            Turn 21 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-215">
+            Turn 22 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-216">
+            Turn 23 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-233">
+            Turn 24 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-249">
+            Turn 25 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-266">
+            Turn 26 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-283">
+            Turn 27 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-284">
+            Turn 28 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-285">
+            Turn 29 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-301">
+            Turn 30 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-318">
+            Turn 31 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-335">
+            Turn 32 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-336">
+            Turn 33 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-351">
+            Turn 34 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-371">
+            Turn 35 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-387">
+            Turn 36 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-388">
+            Turn 37 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-405">
+            Turn 38 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-406">
+            Turn 39 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-422">
+            Turn 40 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-423">
+            Turn 41 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-439">
+            Turn 42 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-462">
+            Turn 43 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-478">
+            Turn 44 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-479">
+            Turn 45 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-496">
+            Turn 46 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-513">
+            Turn 47 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-529">
+            Turn 48 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-530">
+            Turn 49 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-531">
+            Turn 50 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-548">
+            Turn 51 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-549">
+            Turn 52 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-568">
+            Turn 53 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-591">
+            Turn 54 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-592">
+            Turn 55 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-593">
+            Turn 56 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-594">
+            Turn 57 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-595">
+            Turn 58 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-596">
+            Turn 59 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-613">
+            Turn 60 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-614">
+            Turn 61 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-615">
+            Turn 62 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-616">
+            Turn 63 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-617">
+            Turn 64 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-618">
+            Turn 65 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-619">
+            Turn 66 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-620">
+            Turn 67 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-621">
+            Turn 68 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-622">
+            Turn 69 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-623">
+            Turn 70 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-624">
+            Turn 71 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-625">
+            Turn 72 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-642">
+            Turn 73 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-643">
+            Turn 74 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-644">
+            Turn 75 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-645">
+            Turn 76 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-646">
+            Turn 77 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-647">
+            Turn 78 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-648">
+            Turn 79 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-649">
+            Turn 80 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-650">
+            Turn 81 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-651">
+            Turn 82 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-652">
+            Turn 83 <span class="tl-tool">research complete</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-653">
+            Turn 84 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-654">
+            Turn 85 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-655">
+            Turn 86 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-656">
+            Turn 87 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-657">
+            Turn 88 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-658">
+            Turn 89 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-675">
+            Turn 90 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-691">
+            Turn 91 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-707">
+            Turn 92 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-708">
+            Turn 93 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-709">
+            Turn 94 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-726">
+            Turn 95 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-742">
+            Turn 96 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-743">
+            Turn 97 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-744">
+            Turn 98 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-745">
+            Turn 99 <span class="tl-tool">research complete</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-746">
+            Turn 100 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-763">
+            Turn 101 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-780">
+            Turn 102 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-781">
+            Turn 103 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-782">
+            Turn 104 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-783">
+            Turn 105 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-796">
+            Turn 106 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-797">
+            Turn 107 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-798">
+            Turn 108 <span class="tl-tool">summarize webpage</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-799">
+            Turn 109 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-800">
+            Turn 110 <span class="tl-tool">research complete</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-801">
+            Turn 111 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-818">
+            Turn 112 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-819">
+            Turn 113 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-820">
+            Turn 114 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">2↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-838">
+            Turn 115 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-839">
+            Turn 116 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-840">
+            Turn 117 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-841">
+            Turn 118 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-842">
+            Turn 119 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-843">
+            Turn 120 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-844">
+            Turn 121 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-845">
+            Turn 122 <span class="tl-tool">research complete</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-846">
+            Turn 123 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-847">
+            Turn 124 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-848">
+            Turn 125 <span class="tl-tool">research</span>
+            <span class="tl-sub-count">1↓</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-864">
+            Turn 126 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-865">
+            Turn 127 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-866">
+            Turn 128 <span class="tl-tool">refine draft</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+          <li class="tl-item" data-target="card-867">
+            Turn 129 <span class="tl-tool">research complete</span>
+            <span class="tl-chain-dots"
+              ><span class="tl-chain-dot pending">○</span
+              ><span class="tl-chain-dot pending">○</span></span
+            >
+          </li>
+        </ul>
+      </aside>
+
+      <!-- ── Main content ── -->
+      <main class="main">
+        <!-- Prompt -->
+        <div class="prompt-banner">
+          <div class="prompt-label">User Prompt</div>
+          <div class="prompt-text">
+            From 2020 to 2050, how many elderly people will there be in Japan?
+            What is their consumption potential across various aspects such as
+            clothing, food, housing, and transportation? Based on population
+            projections, elderly consumer willingness, and potential changes in
+            their consumption habits, please produce a market size analysis
+            report for the elderly demographic.
+          </div>
+        </div>
+
+        <!-- Rubric -->
+        <div class="rubric-panel">
+          <div
+            class="rubric-panel-header"
+            onclick="
+              var b = this.nextElementSibling;
+              b.classList.toggle('collapsed');
+            "
+          >
+            <div class="rubric-panel-title">📐 Quality Rubric</div>
+            <div
+              style="
+                font-family: var(--mono);
+                font-size: 10px;
+                color: var(--accent);
+              "
+            >
+              generated pre-research · click to expand<svg
+                class="chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </div>
+          <div class="rubric-panel-body collapsed">
+            <div class="rubric-section-label">Coverage Checklist</div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c1]</span>Define “elderly” explicitly;
+              report counts and population share for 2020, 2030, 2040, and 2050,
+              with age splits at least 65–74 and 75+ (ideally 85+ as well).
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c2]</span>Note composition changes that
+              affect consumption: sex balance, one-person vs multi-person
+              elderly households, and regional urban/rural concentration if used
+              in sizing.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c3]</span>Provide current per-person or
+              per-household spend for clothing, food, housing, and
+              transportation for elderly segments, using consistent units and
+              clearly distinguishing single-person and multi-person households.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c4]</span>Include evidence on
+              willingness/propensity to spend vs save, and differences by age
+              band, income/assets, employment status, and health/mobility where
+              data allow.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c5]</span>Show the market-sizing method
+              explicitly: projected persons/households × category spend, with
+              treatment of household-size conversion, price basis (nominal vs
+              real), and whether spending is held constant or changes by
+              cohort/age.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c6]</span>Report category market sizes
+              for at least 2020, 2030, 2040, and 2050, plus total
+              elderly-consumption market and each category’s share/CAGR;
+              clothing, food, housing, and transportation must be separated.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c7]</span>Assess demand-shift mechanisms
+              by category: e.g., food toward convenience/health, housing toward
+              renovation/barrier-free/downsizing, transportation from private
+              car use toward public transit/taxis/delivery, clothing toward
+              lower volume but higher-function demand.
+            </div>
+            <div class="rubric-item">
+              <span class="rubric-id">[c8]</span>Include scenario or sensitivity
+              ranges tied to at least three drivers such as income/pension path,
+              inflation, healthy-life expectancy/care needs, digital adoption,
+              and driving-license relinquishment.
+            </div>
+            <div class="rubric-section-label">⚠️ Hallucination Traps</div>
+            <div class="rubric-trap">
+              Using inconsistent definitions of “elderly” (60+, 65+, 70+, or
+              household-head age) across population and spending datasets.
+            </div>
+            <div class="rubric-trap">
+              Multiplying household expenditure by number of people, or
+              person-level expenditure by number of households, without
+              conversion for household structure.
+            </div>
+            <div class="rubric-trap">
+              Treating “housing expenditure” as full housing consumption for
+              owner-occupiers when many official surveys capture only cash
+              outlays and may exclude imputed rent.
+            </div>
+            <div class="rubric-trap">
+              Confusing nominal growth from inflation with real growth in
+              elderly demand, or failing to state the price basis.
+            </div>
+            <div class="rubric-trap">
+              Assuming the elderly market always grows because the elderly
+              population share rises; the absolute 65+ population may
+              peak/flatten and age-mix shifts can reduce some discretionary
+              categories.
+            </div>
+            <div class="rubric-trap">
+              Projecting one average elderly spending pattern to 2050 without
+              separating younger-old (65–74) from older-old (75+) or accounting
+              for cohort replacement.
+            </div>
+            <div class="rubric-section-label">Insight Bar</div>
+            <div class="rubric-item">
+              Decompose each category’s 2020–2050 market change into three
+              quantified effects—elderly headcount, age-mix shift (65–74 vs
+              75+), and per-capita/per-household spending change—and use that
+              decomposition to explain why necessity categories may expand while
+              discretionary categories stagnate or shrink.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chain analysis -->
+        <div class="chain-panel">
+          <div class="chain-panel-header" onclick="toggleChainPanel(this)">
+            <div class="chain-panel-title">
+              <span class="chain-badge has-chain">⛓ 2 steps</span> Chain
+              Analysis
+            </div>
+            <div
+              style="
+                font-family: var(--mono);
+                font-size: 10px;
+                color: var(--text-light);
+              "
+            >
+              2 chain steps, 2 parallel tasks<svg
+                class="chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </div>
+          <div class="chain-panel-body">
+            <ul class="chain-steps">
+              <li class="chain-step unlocked">
+                <div class="chain-step-connector"></div>
+                <div class="chain-step-num">Step 1</div>
+                <div class="chain-step-lookup">
+                  Retrieve projected number of elderly (aged 65+) in Japan for
+                  each year from 2020 to 2050.
+                </div>
+              </li>
+              <li class="chain-step locked">
+                <div class="chain-step-connector"></div>
+                <div class="chain-step-num">Step 2</div>
+                <div class="chain-step-lookup">
+                  Using [step_1_result] and the consumption data, calculate the
+                  annual market size for clothing, food, housing, and
+                  transportation for elderly consumers in Japan.
+                </div>
+                <div class="chain-step-dep">depends on step 1</div>
+              </li>
+            </ul>
+            <div class="chain-parallel">
+              <div class="chain-parallel-title">⚡ Parallel Tasks</div>
+              <div class="chain-parallel-item">
+                Retrieve per‑capita consumption expenditures for elderly
+                Japanese in categories: clothing, food, housing, and
+                transportation (including any available forecasted changes).
+              </div>
+              <div class="chain-parallel-item">
+                Retrieve data on elderly consumer willingness and potential
+                shifts in consumption habits (e.g., increased online shopping,
+                home‑based services, etc.).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats header -->
+        <div class="trace-header">
+          <div class="trace-header-bar">
+            <div class="trace-header-left">
+              <div class="dot"></div>
+              Trace a6420e44
+            </div>
+            <div class="trace-header-right">openai/gpt-oss-20b</div>
+          </div>
+          <div class="trace-stats">
+            <div class="trace-stat">
+              <span class="trace-stat-val">6732.7s</span
+              ><span class="trace-stat-lbl">Duration</span>
+            </div>
+            <div class="trace-stat">
+              <span class="trace-stat-val">867</span
+              ><span class="trace-stat-lbl">Turns</span>
+            </div>
+            <div class="trace-stat">
+              <span class="trace-stat-val">52</span
+              ><span class="trace-stat-lbl">Sub-Agents</span>
+            </div>
+            <div class="trace-stat">
+              <span class="trace-stat-val">18,528,497</span
+              ><span class="trace-stat-lbl">Input Tokens</span>
+            </div>
+            <div class="trace-stat">
+              <span class="trace-stat-val">1,224,634</span
+              ><span class="trace-stat-lbl">Output Tokens</span>
+            </div>
+          </div>
+          <div style="padding: 0 16px 14px">
+            <div class="token-ratio-bar">
+              <div class="token-ratio-in" style="width: 93.8%"></div>
+              <div class="token-ratio-out" style="width: 6.2%"></div>
+            </div>
+            <div class="token-ratio-legend">
+              <span
+                ><span class="swatch" style="background: var(--accent)"></span>
+                Input 94%</span
+              >
+              <span
+                ><span class="swatch" style="background: var(--success)"></span>
+                Output 6%</span
+              >
+              <span style="color: var(--text-mid)">19,753,131 total</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Turn cards -->
+        <div class="turn-card" id="card-1">
+          <div class="turn-header" onclick="toggle(this)">
+            <div class="turn-header-left">
+              <span class="turn-badge badge-root">root</span
+              ><span class="turn-badge badge-tool">1 tool</span
+              ><span class="turn-badge badge-reasoning">reasoning</span
+              ><span class="turn-title">Turn 1</span>
+            </div>
+            <div class="turn-meta">
+              <span class="tokens-pill"
+                ><span class="tok-in">↓10,035</span><span class="tok-sep"></span
+                ><span class="tok-out">↑4,014</span></span
+              ><span>147.92s</span
+              ><svg
+                class="chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </div>
+          <div class="turn-body">
+            <div class="chain-progress">
+              <span class="chain-progress-label">⛓ Chain:</span
+              ><span
+                class="chain-pill unlocked"
+                title="Step 1: Retrieve projected number of elderly (aged 65+) in Japan for"
+                >🔓 Step 1</span
+              ><span
+                class="chain-pill locked"
+                title="Step 2: Using [step_1_result] and the consumption data, calculate th"
+                >🔒 Step 2</span
+              >
+            </div>
+            <div class="turn-section">
+              <div class="turn-section-label">🧠 Reasoning</div>
+              <div class="reasoning">
+                We have user request: &quot;From 2020 to 2050, how many elderly
+                people will there be in Japan? What is their consumption
+                potential across various aspects such as clothing, food,
+                housing, and transportation? Based on population projections,
+                elderly consumer willingness, and potential changes in their
+                consumption habits, please produce a market size analysis report
+                for the elderly demographic.&quot; We need to output a research
+                report/analysis in final answer after collecting data. We are
+                supposed to be a &quot;Document Editor&quot; that controls
+                research. We must not produce plain text until we call tools for
+                at least 2 research tasks. The system says we must call
+                conduct_research at least once before refine_draft, but also we
+                need multiple research tasks. In our plan, we need to plan
+                research tasks to answer the question. We must follow the
+                protocol. That means we produce a plan of tasks, call
+                conduct_research, then refine_draft after we have enough info.
+                So step 1: plan tasks. User&#x27;s question: We need to deliver
+                a final research report with defined structure. The content must
+                include projections for elderly population counts, consumption
+                potential across categories, consumption willingness, habit
+                changes. We need to produce a report that is 2000-4000 words
+                since it&#x27;s FOCUSED question? The question: &quot;From 2020
+                to 2050... produce a market size analysis report.&quot;
+                It&#x27;s fairly detailed but likely a multi-year projection. So
+                we might check if it&#x27;s FOCUSED or STANDARD. The question
+                demands a deep, multiple dimensions: population counts,
+                consumption patterns, separate categories, shift analysis. So we
+                might consider it a standard question but with moderate depth
+                due to analysis. We need to produce a 2000-4000 words report,
+                2-3 body sections. But given the rubric and requirement for
+                decomposition and exhaustive coverage, we should aim for maybe
+                4000-6000 words with 3-4 sections. The rules mention
+                &quot;Standard&quot; for focused research question. But this may
+                be moderately deep. According to guidelines: deeply integrated
+                but not extremely large like 10k. The user demands a market size
+                analysis report for elderly: data for each year, categories.
+                That may be 2000-4000 words. Provide sub-sections. We must
+                determine the plan. Let&#x27;s break the question into
+                sub-questions: - Sub-question 1: Provide population projections
+                for elderly (65+) from 2020 to 2050, in key years (2020, 2030,
+                2040, 2050) with age splits (65-74, 75+, 85+). Ensure use
+                official sources - Japanese Statistical Bureau, Population
+                Census, etc. - Sub-question 2: Provide baseline spending per
+                capita/per household for elderly in categories: clothing, food,
+                housing, transportation, in 2020, potentially trend. Use
+                official consumption/expenditure surveys: Japan&#x27;s Family
+                Income and Expenditure Survey (FIES) by Statistics Bureau. Also
+                maybe additional sources: Japanese Ministry of Internal Affairs
+                and Communications, resident budget. - Sub-question 3: Provide
+                willingness/propensity to spend: attitudes towards consumption,
+                patterns. Use surveys: Japanese Elderly Survey, consumer
+                satisfaction, maybe from research firms. But we can also include
+                official indicators: pension levels, disposable income. -
+                Sub-question 4: Provide consumption habit changes projection:
+                e.g., shift to online shopping, home-based services, mobility
+                changes. Use e-commerce penetration data, building trends. Use
+                analysis from industry reports. For research, we may need to
+                find sources for such shift. - Sub-question 5: Build market size
+                calculation: use population * per capita spending. Provide
+                totals for each category for baseline 2020, 2030, 2040, 2050.
+                Provide trends: CAGR, share. - Sub-question 6: Provide
+                sensitivity analysis or scenario: how changes in incomes,
+                inflation, health, digital adoption impact consumption. Provide
+                at least 3 drivers. Plan tasks: Task 1 - Population projections:
+                Find data for elderly population counts by year 2020-2050.
+                Official sources: &quot;Statistics Bureau of Japan&quot;,
+                &quot;Japan 2025 Census projection&quot;, &quot;Population
+                Projection 2023&quot; maybe from &quot;Central Institute of
+                Population Economics&quot; (CIPER), or &quot;Japanese
+                government.&quot; Also &quot;Japan Statistical Yearbook&quot;.
+                We need to find the official numbers, including age breakdown.
+                Task 2 - Spending data: Find current per capita expenditure
+                across categories for elderly 65+. Official data from Family
+                Income and Expenditure Survey. Or &quot;Consumer Expenditure
+                Survey by Ministry of Economy&quot; Also &quot;Japanese
+                consumption survey 2020&quot;. Task 3 - Willingness and
+                consumption patterns: Search for surveys on elderly consumer
+                spending behavior, maybe &quot;Elderly Online Shopping
+                Survey&quot; by e-commerce websites, &quot;Japan Digital
+                Adoption 2020-2025&quot; or &quot;Elderly digital consumption
+                trends&quot;. Task 4 - Consumption habits changes: Search for
+                research on &quot;elderly housing renovation&quot;,
+                &quot;elderly transportation mode shift&quot;, &quot;elderly
+                clothing preferences&quot;. may need to consult industry reports
+                from &quot;Nikkei&quot; or &quot;Grand View Research&quot;. Task
+                5 - Integration and calculations? Not needed: we will create our
+                own calculations. We just need data from tasks. We might also
+                need data on price inflation baseline or keep nominal. Use
+                official CPI data for health and consumer price tags. Also need
+                sources for wage, pension. We need to be careful with the
+                &quot;Intermediate chain&quot; approach stated earlier: But we
+                can combine tasks because we know we will do multiple tasks
+                serially. But the chain suggested earlier: Step 1: Get
+                population projections. Step 2: Using step1 and consumption
+                data, calculate market sizes. But we only need to gather data
+                first. So we should first accomplish population extraction. Then
+                we can gather consumption data. We need to store results in
+                memory. Provide tasks with enough context. But dynamic chain
+                suggests typical design. I think we should firstly request the
+                population projections. Then find spending information. And so
+                on. We&#x27;ll do tasks in parallel with the following order:
+                We&#x27;ll first get the population. Then consumption data. Then
+                willingness/habit changes. Then we will love to also incorporate
+                inflation &amp; price level but we can approximate with CPI.
+                Now, we need to produce a draft after 2 research tasks. But we
+                require multi-step plan and we must run at least 2
+                conduct_research calls before the first refine_draft. So we can
+                proceed: - Perform research: Task 1: Retrieve population
+                projection. Provide all numbers for each year at least 2020,
+                2030, 2040, 2050 and age breakdown. - Task 2: Retrieve per
+                capita spending categories for elderly in 2020. Provide separate
+                categories: clothing, food, housing, transportation. Possibly
+                also provide per household if needed. - Also we may need to
+                gather average income/pension for elderly in 2020. However, if
+                we need to compute future consumption we could assume constant
+                per-capita spending baseline. But the user might want to
+                consider changes in consumption habits. But at minimum we can
+                say &quot;Assuming constant per capita spending and inflation,
+                but adjust for potential changes.&quot; Thus after doing tasks 1
+                and 2, we can now produce a draft answer summarizing the
+                population and baseline spending, show calculation for market
+                size for 2020 and likely 2030/2040/2050 using static per capita
+                and constant nominal growth assumption. Then at this point we
+                still need will-be consumption changes. But we could incorporate
+                some early reported data for consumption patterns. But maybe we
+                can incorporate 1 more step: find data on willingness and habit
+                changes including digital adoption rates. But we could postpone
+                to the next research round. But the user expects a single
+                comprehensive report. However, per guidelines, we need to
+                produce a draft after at least 2 research tasks. We can deliver
+                an incomplete draft that includes separate sections for
+                population, baseline spending, basic market sizing, and note
+                that we will incorporate further changes after additional
+                research. But the final answer should be a complete report, no
+                gaps. We can produce a proactive plan: after tasks, we plan to
+                do further tasks to incorporate habit changes. However, we
+                can&#x27;t provide such steps before they are done. So we need
+                to produce a complete answer early, but we might have gaps. But
+                the guidelines gave that we can mark gaps. But final output must
+                not include [GAP] markers; but we can produce it as placeholder?
+                Actually guidelines say that in intermediate drafts we can mark
+                gaps, but final output must not contain those or mention we need
+                more research. If we produce a draft without finishing the
+                analysis, the final output might be incomplete. But it may still
+                be acceptable if we explicitly still uncertain. However the user
+                requested a full market size analysis. Failing to deliver
+                incomplete data might not satisfy. But we may circumvent by
+                performing more research tasks: retrieve a few more data points.
+                We could do Task 3: Find data on average disposable incomes of
+                elderly and consumption willingness. That data will allow better
+                forecasting. Task 4: Find data on adoption of digital services,
+                home care etc. This data may help adjust per capita spending.
+                Task 5: Gather CPI for inflation. But we need to consider the
+                number of tasks vs operating time. Each conduct_research call
+                may take time, but we can ask for multiple tasks at once. The
+                sub-agent can get all necessary data if we formulate tasks
+                carefully. But we cannot ask for several tasks at once in one
+                conduct_research call; each call is separate. But we can chain
+                them. But performing so many calls may be heavy. But still okay.
+                However, we should comply with the design: For a multi-step
+                answer, we need to plan tasks, then issue them sequentially,
+                storing results, then produce final report. We&#x27;ll do that
+                now. We must not produce final output until we have collected
+                enough data (~maybe 5-6 tasks). But we could accomplish many
+                tasks in parallel as sub-agents can fetch multiple pages.
+                Let&#x27;s think about what data is needed for basic answer: -
+                Population projection: Ideally official figure list. - Per
+                capita consumption: We can get numbers for clothing, food,
+                housing, transportation for 2020. We might get them from the
+                &quot;Family Income and Expenditure Survey&quot; for
+                &quot;elderly&quot;. But maybe the survey doesn&#x27;t provide
+                separate for elderly; might provide age group 65+ average
+                household expenditures. We&#x27;ll find it. - We need baseline
+                per capita/housing. We may find per-household or per capita. -
+                For market sizing we need to multiply counts by per capita
+                spend. We&#x27;ll need to differentiate households: e.g.,
+                single-person vs multi-person households. But we can
+                approximate: multiply total people by spending per person. But
+                to be correct, we might use average expenditure per person for
+                age 65+. Better to locate &quot;Elderly consumption per
+                person&quot; from dataset &quot;Survey of Household
+                Spending&quot; by Ministry of Internal Affairs. Let&#x27;s
+                outline tasks: Task 1: Population projections for Japan elderly
+                from 2020 to 2050, age breakdown 65-74, 75-84, 85+. Use official
+                Japanese government &quot;Population Projections&quot; published
+                by Ministry of Internal Affairs and Communications (MIC) for
+                2021 or 2023. This includes 5-year intervals. Provide counts for
+                2020, 2030, 2040, 2050. Task 2: Retrieve per capita expenditure
+                for elderly 65+ in 2020, disaggregated by category: - Clothing -
+                Food - Housing (housing cost includes rent, mortgage, utilities,
+                maybe separate from housing services? Usually &quot;household
+                housing&quot; includes rent/owner monthly payments plus
+                utilities. We&#x27;ll mention if includes imputed rent? Provide
+                note. - Transportation - Possibly provide overall categories.
+                Use &quot;Family Income and Expenditure Survey 2020&quot; or
+                &quot;Household expenditure survey 2020&quot;. Task 3: Retrieve
+                data on willingness to spend and behavior preferences of
+                elderly: Use &quot;Japan Aging Study&quot;, &quot;e‑commerce
+                penetration among seniors&quot;, &quot;Elderly consumer
+                satisfaction&quot;, etc. Provide numeric approximate rates:
+                e.g., % of elderly who shop online, % living alone, etc. Task 4:
+                Retrieve data on potential consumption habit changes: e.g.,
+                shift to convenience foods, shift to online shopping, shift to
+                barrier-free houses, shift to public transport, etc. Use year
+                2023-2025 trend data from industry reports or research. Task 5:
+                Retrieve CPI inflation data for up to 2025 and forecast for
+                2025-2050? but for baseline we may assume 2% inflation nominal.
+                Use &quot;Japan Consumer Price Index&quot; compiled by Stats
+                Bureau. We need to do at least 2 tasks before refine_draft. But
+                we also need the big data for final output. According to
+                guidelines, we can do a minimum of 2 tasks now, then produce a
+                partial draft with [GAP] markers, then we will do further tasks
+                to fill them. However, the guidelines say &quot;The final output
+                should be a complete report. The draft final answer must not
+                have gaps.&quot; But in intermediate draft we can mark gaps. The
+                final call to research_complete will deliver final answer; It
+                will be reviewed by quality checker. If we provide incomplete
+                report, the reviewer may flag missing data. So we must deliver
+                full final answer. So we must do enough research to fill all
+                required data. But we might do 5 tasks, then produce final draft
+                using refine_draft. That is allowed. Hence, we should schedule
+                tasks: - conduct_research for Task 1 - conduct_research for Task
+                2 - conduct_research for Task 3 - conduct_research for Task 4 -
+                conduct_research for Task 5 I think that&#x27;s sufficient: we
+                will get all required data. Now, we need to compose tasks in
+                self-contained way. Each task must contain all context needed
+                and specify output. We&#x27;ll ask for data in a structured
+                format. We&#x27;ll also ensure references: each sub-agent return
+                bullet points with facts and URLs. But we can&#x27;t guarantee
+                exactly. We&#x27;ll just ask them to provide results with inline
+                citations maybe. But gather data. We must keep article length
+                high (maybe 4000-6000 words). We&#x27;ll produce a comprehensive
+                report after all data is collected. But we don&#x27;t yet have
+                the data. So we first schedule tasks. Let&#x27;s produce first
+                deliverable: call conduct_research with all tasks? But
+                guidelines say we must do at least 2 stand-alone research calls.
+                We can chain them sequentially. Let&#x27;s call for Task 1
+                first. We&#x27;ll do: 1st call: conduct_research task:
+                &quot;Retrieve projected elderly population (65+ and age splits
+                65-74, 75-84, 85+) for Japan for years 2020, 2030, 2040, 2050.
+                Source from official Japanese government demographic projections
+                (Statistics Bureau, Ministry of Internal Affairs and
+                Communications). Provide numbers per year, and the method used
+                to compute projection.&quot; We also want the sub-agent to
+                locate the dataset on the web. That will be some PDFs, or a
+                database. We&#x27;ll ask for the result. We also need to
+                guarantee we get per-year numbers but the sources may only have
+                5-year intervals. We may provide numbers for 2025, 2030, etc.
+                Ok. Next call: &quot;Retrieve per capita grocery/clothing etc.
+                consumption for elderly 65+ in 2020 from official household
+                expenditure survey. Provide average per-person spending amounts
+                for categories: clothing, food (including meals, groceries,
+                dining out), housing (rent/mortgage, utilities), transportation
+                (public transit, car). Provide separate values for single-person
+                households and two or more person households, if
+                available.&quot; Third call: &quot;Retrieve data on willingness
+                to spend, e.g., proportion of elderly that participate in online
+                shopping, consumer confidence, e.g., Senior consumer trust
+                indexes, etc. Provide numbers and sources.&quot; Fourth call:
+                &quot;Retrieve data on anticipated changes in consumption habits
+                among elderly, e.g., trend data on hospitalization, home-care,
+                barrier-free housing, digital adoption, including projections up
+                to 2050.&quot; Fifth call: &quot;Retrieve CPI inflation data
+                annual nominal growth rate forecast for Japan and specifically
+                consumer price index for relevant categories. Provide year by
+                year nominal inflation for 2021-2025 and any forecast data to
+                2050 if possible.&quot; Possibly we could also request data on
+                average pension level and disposable income for elderly, but
+                maybe the medium can incorporate it. However, we might also
+                query for &quot;average pension/ disposable income&quot; for
+                elderly. This is easier; we can then adjust spending patterns.
+                But we may not need to produce adjusting. But we might as well
+                do a sixth call: &quot;Retrieve average pension payments for
+                elderly 65+ in Japan for 2020 and forecast growth until
+                2050.&quot; But that may be too many tasks. But okay. Let&#x27;s
+                decide: 5 tasks seems enough. Thus we will schedule them in
+                order. After each call we will receive a summary result. Then we
+                will engage next call. But to minimize risk of missing tasks,
+                maybe we combine some tasks: e.g., we can ask Task 1: get
+                population and per capita consumption into one. But we
+                don&#x27;t want to overload. Let&#x27;s keep separate as
+                recommended. Nevertheless, the sub-agent might be efficient and
+                return two tasks in one call. But guidelines: each
+                conduct_research call is one sub-agent request. So we can ask
+                for one bigger query: gather both population and consumption? We
+                can ask for &quot;Find the population projection for elderly 65+
+                in Japan for years 2020, 2030, 2040, 2050; and extract per
+                capita spending in clothing, food, housing, transportation for
+                age group 65+ in 2020 from official statistics.&quot; That can
+                be done in one call if the sub-agent has enough time. But it may
+                be risk to have too many tasks. It may be okay. The guidelines
+                say each call is a sub-agent. We can combine tasks but we risk
+                missing some. Better to separate tasks to ensure each returns
+                distinct results. But we also need to minimize number of calls.
+                We need at least 2 calls. Additional calls are allowed. There is
+                no penalty for many calls. Ok, proceed with 5 calls. Let&#x27;s
+                start with first call. We&#x27;ll call conduct_research:
+                Parameters: task string: &quot;Task: Retrieve projected elderly
+                population (65+ and age subgroups 65-74, 75-84, 85+) for Japan
+                for years 2020, 2030, 2040, 2050. Source: official Japanese
+                government demographic projections from Statistics Bureau,
+                Ministry of Internal Affairs and Communications. Provide exact
+                numbers and the source URL(s) with citations.&quot; No context
+                or memory_keys needed. Also we must confirm to the guidelines:
+                the sub-agent should return bullet list of facts (age group
+                counts per year) and the source URLs. Ok. Output back.
+                Let&#x27;s proceed to call tool.
+              </div>
+            </div>
+            <div class="turn-section">
+              <div class="turn-section-label">🛠️ Tool Calls</div>
+              <div
+                class="spawn-card"
+                title="Click to scroll to sub-agent turns"
+              >
+                <div class="spawn-label">
+                  SPAWNED SUB-AGENT &middot; 16 turns &middot; 72.3s
+                </div>
+                <div class="spawn-task">
+                  Retrieve projected elderly population (65+ and age subgroups
+                  65-74, 75-84, 85+) for Japan for the years 2020, 2030, 2040,
+                  and 2050. Use official Japanese government demographic
+                  projections from the Statistics Bureau of Japan (e.g.,
+                  &quot;Population Projection 2021&quot; or &quot;Future
+                  Population Es
+                </div>
+              </div>
+              <div class="tool-block">
+                <div class="tool-block-header" onclick="toggleTool(this)">
+                  <svg
+                    class="chevron"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M6 9l6 6 6-6" /></svg
+                  ><span class="tool-fn">conduct_research</span
+                  ><span
+                    style="
+                      margin-left: auto;
+                      font-size: 10px;
+                      color: var(--text-light);
+                    "
+                    >72.32s</span
+                  >
+                </div>
+                <div class="tool-block-body">
+                  <div
+                    style="
+                      font-size: 9px;
+                      color: var(--text-light);
+                      text-transform: uppercase;
+                      letter-spacing: 0.1em;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Arguments
+                  </div>
+                  <pre class="tool-args-pre">
+{
+  &quot;task&quot;: &quot;Retrieve projected elderly population (65+ and age subgroups 65-74, 75-84, 85+) for Japan for the years 2020, 2030, 2040, and 2050. Use official Japanese government demographic projections from the Statistics Bureau of Japan (e.g., \&quot;Population Projection 2021\&quot; or \&quot;Future Population Estimate 2023\&quot;). Provide exact numeric counts for the total 65+ population and each age subgroup. Also list the source URL(s) or document names with page numbers if applicable.&quot;
+}</pre
+                  >
+                  <div class="tool-result">
+                    <div
+                      style="
+                        font-size: 9px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                        margin-bottom: 4px;
+                      "
+                    >
+                      Result
+                    </div>
+                    <pre class="tool-output-pre">
+{&quot;response&quot;: &quot;The user asked for the projected elderly population (65+ and subgroups 65-74, 75-84, 85+) for Japan for years 2020, 2030, 2040, 2050. They want official Japanese government demographic projections from the Statistics Bureau or IPSS. We have the IPSS PDF \&quot;Population Projections for Japan (2023 revision)\&quot;. But from our attempts we cannot reliably locate specific numeric values for all subgroups. The text shows some lines about \&quot;Aged 65-74\&quot; with repeating names, but no numbers.\n\nWe need to parse numeric tables. The PDF likely contains a table listing age group breakdowns for each year. In the summary, there&#x27;s \&quot;Table 1-1\&quot; which has population totals for major three age groups: under 15, 15-64, and 65 and over. But we need further breakdown into subgroups 65-74, 75-84, 85+. The PDF text doesn&#x27;t show those sub-subgroups numbers; maybe further tables like \&quot;Table 1-? - Age composition (by 5-year groups)\&quot; or \&quot;Table 3-?\&quot; etc.\n\nIn the extracted text, we saw a \&quot;Table 1-? Numbers\&quot; but not the numeric details. We don&#x27;t have those numbers due to the truncation.\n\nPotential path: For subgroups, the best official source may be the supplementary tables: It references \&quot;Supplement Table 1- etc.\&quot; maybe contains age groups. But our extracted text shows only a textual description; but the actual PDF may have many tables.\n\nWithout numeric data, we cannot answer. We could attempt to locate the supplementary tables in the PDF using the page numbers. The page references we saw like \&quot;Supplement Table 1\&quot; etc.\n\nMaybe easier: The official Statistics Bureau \&quot;Population projection 2021\&quot; might be on the e-stat website with a table. Let&#x27;s search for that.\n\nSearch: \&quot;Population Projection 2021 65-74 Japan\&quot; web.&quot;, &quot;turns_used&quot;: 15, &quot;tool_calls_made&quot;: 15, &quot;depth&quot;: 1}</pre
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <details class="sub-agent-group" id="card-1-subs">
+          <summary class="sub-agent-group-summary">
+            <span class="sub-agent-group-icon">▶</span> 1 sub-agent · 16 turns
+          </summary>
+          <div class="sub-agent-group-body">
+            <div class="turn-card" id="card-2">
+              <div class="turn-header" onclick="toggle(this)">
+                <div class="turn-header-left">
+                  <span class="turn-badge badge-sub">sub</span
+                  ><span class="turn-badge badge-tool">1 tool</span
+                  ><span class="turn-badge badge-reasoning">reasoning</span
+                  ><span class="turn-title">Sub-Agent #1 — Turn 1</span>
+                </div>
+                <div class="turn-meta">
+                  <span class="tokens-pill"
+                    ><span class="tok-in">↓6,893</span
+                    ><span class="tok-sep"></span
+                    ><span class="tok-out">↑716</span></span
+                  ><span>4.77s</span
+                  ><svg
+                    class="chevron"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+              <div class="turn-body">
+                <div class="turn-section">
+                  <div class="turn-section-label">🧠 Reasoning</div>
+                  <div class="reasoning">
+                    The user instruction: &quot;Retrieve projected elderly
+                    population (65+ and age subgroups 65-74, 75-84, 85+) for
+                    Japan for the years 2020, 2030, 2040, and 2050. Use official
+                    Japanese government demographic projections from the
+                    Statistics Bureau of Japan (e.g., &quot;Population
+                    Projection 2021&quot; or &quot;Future Population Estimate
+                    2023&quot;). Provide exact numeric counts for the total 65+
+                    population and each age subgroup. Also list the source
+                    URL(s) or document names with page numbers if
+                    applicable.&quot; We need to retrieve projected elderly
+                    population for Japan for 2020, 2030, 2040, 2050. The
+                    populations for 65+ and subgroups 65-74, 75-84, 85+. We must
+                    use official Japanese government demographic projections
+                    from the Statistics Bureau of Japan. That includes likely
+                    &quot;Population Projection 2021&quot; (新世紀人口推計
+                    2021?) and &quot;Future Population Estimate 2023&quot;
+                    (未来人口統計 2023?). Might also be &quot;Population
+                    Projection 2023&quot; or some &quot;2024 Projections&quot;
+                    etc. We must provide exact numeric counts for those years.
+                    Source URLs or document names with page numbers if
+                    applicable. We need to gather from a reliable official
+                    source. Likely there is a PDF or dataset from the Statistics
+                    Bureau of Japan, &quot;Population Projection 2023&quot; or
+                    &quot;Future Population Projection&quot;. The data may exist
+                    in tables for 2020, 2030, 2040, and 2050. We need to search,
+                    find the correct documents and tables, extract the data, and
+                    produce bullet points with the counts and source URLs. Thus
+                    we have to identify the correct PDF or dataset. The user
+                    basically expects us to find population projections: for
+                    Japan, 65+ and subgroups, in years 2020, 2030, 2040, and
+                    2050. We need Excel or CSV? Could be a PDF with tables. Our
+                    approach: 1. Search web for &quot;Statistics Bureau of Japan
+                    population projection 2021 elderly population 65+ 2030 2040
+                    2050&quot;. Use search_web. 2. Look at search results. Maybe
+                    the PDF &quot;Population Projection 2021&quot; is available.
+                    3. Retrieve that PDF via read_pdf or fetch_url? Might try
+                    fetch_url of that PDF. But read_pdf can be used to extract
+                    the text. Maybe the PDF is large. We&#x27;ll likely find a
+                    PDF like &quot;Population Projection 2021&quot; with tables
+                    for each year, segments by age and sex. The PDF may contain
+                    a table for 2020, 2030, 2040, 2050. Alternatively, they
+                    produce &quot;Population Projection 2023 (Population
+                    Projections 2023)&quot; in PDF. Better to try a search. Also
+                    might find an Excel file dataset. For example,
+                    &quot;Population Projections: 2020-2050 Japan&quot; or
+                    &quot;http://www.stat.go.jp/ss/nihongokokuhakusho/#search&quot;
+                    something. Given limited time, I will do a quick search for
+                    &quot;Population Projection 2021 Japan elderly population
+                    65-74 2030 2040 2050&quot;. Let&#x27;s do that.
+                  </div>
+                </div>
+                <div class="turn-section">
+                  <div class="turn-section-label">🛠️ Tool Calls</div>
+                  <div class="tool-block">
+                    <div class="tool-block-header" onclick="toggleTool(this)">
+                      <svg
+                        class="chevron"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M6 9l6 6 6-6" /></svg
+                      ><span class="tool-fn">search_web</span
+                      ><span
+                        style="
+                          margin-left: auto;
+                          font-size: 10px;
+                          color: var(--text-light);
+                        "
+                        >1.69s</span
+                      >
+                    </div>
+                    <div class="tool-block-body">
+                      <div
+                        style="
+                          font-size: 9px;
+                          color: var(--text-light);
+                          text-transform: uppercase;
+                          letter-spacing: 0.1em;
+                          margin-bottom: 4px;
+                        "
+                      >
+                        Arguments
+                      </div>
+                      <pre class="tool-args-pre">
+{
+  &quot;q&quot;: &quot;Japan population projection 2021 elderly 65+ 2030 2040 2050 pdf&quot;,
+  &quot;num_results&quot;: 10
+}</pre
+                      >
+                      <div class="tool-result">
+                        <div
+                          style="
+                            font-size: 9px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.1em;
+                            margin-bottom: 4px;
+                          "
+                        >
+                          Result
+                        </div>
+                        <pre class="tool-output-pre">
+Search Results for &#x27;Japan population projection 2021 elderly 65+ 2030 2040 2050 pdf&#x27;:
+
+1. [PDF] Population Projections for Japan (2023 revision): 2021 to 2070
+   URL: https://www.ipss.go.jp/pp-zenkoku/e/zenkoku_e2023/pp2023e_Summary.pdf
+   Population Projections for Japan (2023 revision): 2021 to 2070 
+Appendix: Auxiliary Projections 2071 to 2120 
+Contents 
+Key Messages (4) 
+I Overview of the Population Projections for Japan (7) 
+II Summary of the Projection Results (7) 
+[Projection Re
+
+2. [PDF] Addressing demographic headwinds in Japan: A long - OECD
+   URL: https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/04/addressing-demographic-headwinds-in-japan-a-long-term-perspective_85b9a67f/96648955-en.pdf
+   OECD Economics Department Working Papers No. 1792
+Addressing demographic
+headwinds in Japan: A longterm perspective
+Randall S. Jones
+https://dx.doi.org/10.1787/96648955-en
+ 
+Organisation for Economic Co-operation and Development
+ECO/WKP(2024)4
+Uncla
+
+3. [PDF] Annual Report on the Ageing Society [Summary] FY2024
+   URL: https://www8.cao.go.jp/kourei/english/annualreport/2024/pdf/2024.pdf
+   Annual Report 
+on the Ageing Society 
+[Summary] FY2024
+June 2024 
+Cabinet Office 
+Japan 
+1
+2
+Chapter 1 Situation of the Ageing Population
+Section 1 Situation of the Ageing Population (Trends in Ageing population and Projection for the Future)
+Section
+
+4. The Future Process of Japan&#x27;s Population Aging: A Cluster Analysis ...
+   URL: https://link.springer.com/article/10.1007/s11113-024-09903-5
+   The Future Process of Japan’s Population Aging: A Cluster Analysis Using Small Area Population Projection Data | Population Research and Policy Review | Springer Nature Link
+Skip to main content
+Advertisement
+[
+![Springer Nature Link](https://link.sp
+
+5. Japan - WHO Data
+   URL: https://data.who.int/countries/392
+   Japan
+
+## Population, Japan
+
+### Demographic change 2023 - 2050
+
+## Life expectancy, Japan Learn more
+
+- Healthy life expectancy
+- Life expectancy
+
+What is the difference between life expectancy and healthy life expectancy?
+
+&quot;Life expectancy&quot; refers 
+
+6. Ageing Population: Data Reports 2026
+   URL: https://wifitalents.com/ageing-population-statistics/
+   Ageing Population: Data Reports 2026
+
+Menu
+
+© 2026 WifiTalents. All rights reserved.
+
+## How we built this report
+
+Every data point in this report goes through a four-stage verification process:
+
+01
+
+### Primary source collection
+
+Our research team a
+
+7. [PDF] IMPACT OF JAPAN&#x27;S AGING POPULATION IN 2030 - Mitsui
+   URL: https://www.mitsui.com/mgssi/en/report/detail/__icsFiles/afieldfile/2023/08/30/2307k_suzuki_e_2.pdf
+   Mitsui &amp; Co. Global Strategic Studies Institute Monthly Report July 2023
+1 
+IMPACT OF JAPAN’S AGING POPULATION IN 2030
+— FOCUSING ON THE EFFECT ON THE SOCIAL SECURITY SYSTEM AND 
+LOCAL ECONOMIES — 
+Yusuke Suzuki
+Global Economic &amp; Political Studies Di
+
+8. Annual Report on the Ageing Society [Summary] FY2021
+   URL: https://www8.cao.go.jp/kourei/english/annualreport/2021/pdf/2021.pdf
+   Annual Report
+on the Ageing Society
+[Summary] FY2021
+July 2021
+Cabinet Office
+Japan
+This Report concerns the state of ageing and statements on the implementation of measures adopted by the government 
+for the ageing society and documents clarifying m
+
+9. Population Projection for Japan
+   URL: https://www.ipss.go.jp/pp-newest/e/ppfj02/top.html
+   Population Projection for Japan
+
+--
+
+Population Projections for Japan:2001-2050
+
+With Long-range Population Projections: 2051 - 2100
+
+| Acrobat Reader download here Please click the following icon to view Population Projections for Japan. |
+| --- |
+
+
+
+10. No title
+   URL: https://www.ipss.go.jp/pp-zenkoku/e/zenkoku_e2017/g_images_e/pp29gts03e.files/sheet001.htm
+   ## -- Population Projections for Japan (2017)
+
+Download
+
+| Table 5-3: Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and age composition: Low-fertility (medium-mo
+
+</pre
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="turn-card" id="card-3">
+              <div class="turn-header" onclick="toggle(this)">
+                <div class="turn-header-left">
+                  <span class="turn-badge badge-sub">sub</span
+                  ><span class="turn-badge badge-tool">2 tools</span
+                  ><span class="turn-title">Sub-Agent #1 — Turn 2</span>
+                </div>
+                <div class="turn-meta">
+                  <span class="tokens-pill"
+                    ><span class="tok-in">↓8,176</span
+                    ><span class="tok-sep"></span
+                    ><span class="tok-out">↑418</span></span
+                  ><span>5.51s</span
+                  ><svg
+                    class="chevron"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+              <div class="turn-body">
+                <div class="turn-section">
+                  <div class="turn-section-label">🛠️ Tool Calls</div>
+                  <div class="tool-block">
+                    <div class="tool-block-header" onclick="toggleTool(this)">
+                      <svg
+                        class="chevron"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M6 9l6 6 6-6" /></svg
+                      ><span class="tool-fn">think</span
+                      ><span
+                        style="
+                          margin-left: auto;
+                          font-size: 10px;
+                          color: var(--text-light);
+                        "
+                        >0.00s</span
+                      >
+                    </div>
+                    <div class="tool-block-body">
+                      <div
+                        style="
+                          font-size: 9px;
+                          color: var(--text-light);
+                          text-transform: uppercase;
+                          letter-spacing: 0.1em;
+                          margin-bottom: 4px;
+                        "
+                      >
+                        Arguments
+                      </div>
+                      <pre class="tool-args-pre">{}</pre>
+                      <div class="tool-result">
+                        <div
+                          style="
+                            font-size: 9px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.1em;
+                            margin-bottom: 4px;
+                          "
+                        >
+                          Result
+                        </div>
+                        <pre class="tool-output-pre">
+[Think rejected — too brief] Your think() call must be a substantive reflection. Include:
+  1. What data you have gathered so far
+  2. What is still missing for the task
+  3. Your plan for the next 1-2 tool calls
+Call think() again with at least a few sentences of reflection.</pre
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tool-block">
+                    <div class="tool-block-header" onclick="toggleTool(this)">
+                      <svg
+                        class="chevron"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M6 9l6 6 6-6" /></svg
+                      ><span class="tool-fn">fetch_url</span
+                      ><span
+                        style="
+                          margin-left: auto;
+                          font-size: 10px;
+                          color: var(--text-light);
+                        "
+                        >3.71s</span
+                      >
+                    </div>
+                    <div class="tool-block-body">
+                      <div
+                        style="
+                          font-size: 9px;
+                          color: var(--text-light);
+                          text-transform: uppercase;
+                          letter-spacing: 0.1em;
+                          margin-bottom: 4px;
+                        "
+                      >
+                        Arguments
+                      </div>
+                      <pre class="tool-args-pre">
+{
+  &quot;url&quot;: &quot;https://www.ipss.go.jp/pp-zenkoku/e/zenkoku_e2023/pp2023e_Summary.pdf&quot;,
+  &quot;css_selector&quot;: &quot;&quot;,
+  &quot;extract&quot;: &quot;text&quot;
+}</pre
+                      >
+                      <div class="tool-result">
+                        <div
+                          style="
+                            font-size: 9px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.1em;
+                            margin-bottom: 4px;
+                          "
+                        >
+                          Result
+                        </div>
+                        <pre class="tool-output-pre">
+[PDF detected by URL — extracted with read_pdf]
+
+ 
+ 
+ 
+Population Projections for Japan (2023 revision): 2021 to 2070 
+Appendix: Auxiliary Projections 2071 to 2120 
+ 
+Contents 
+Key Messages (4) 
+ 
+I Overview of the Population Projections for Japan (7) 
+ 
+II Summary of the Projection Results (7) 
+[Projection Results for Medium-, High-, and Low-Fertility (Medium-Mortality)] (7) 
+1. Trends in Total Population (7) 
+2. Trends in the Size and Composition of the Population by the Major Three Age Groups (8) 
+3. Trends in dependency ratio (9) 
+4. Changes in the Population Pyramid (10) 
+[Projection Results for Medium-Fertility (High- and Low-Mortality)] (10) 
+1. Summary of Projection Results with High-Mortality Assumption (10) 
+2. Summary of Projection Results with Low-Mortality Assumption (10) 
+[Projection Results for High- and Low-Fertility (High-, Low-Mortality)] (11) 
+ 
+III Summary of the Method Used for Population Projections (11) 
+1. Base Population (11) 
+2. Assumptions for Fertility Rates and Sex Ratio at Birth (11) 
+3. Assumptions for Survival Rates (Future Life Table) (15) 
+4. Assumptions for International Migration Rates (Numbers) (16) 
+5. Long-range Auxiliary Projections, Projections for the Japanese Population, and Conditional Population 
+Projections (17) 
+Summary of Projection Results (medium-mortality projection) (19) 
+Summary of Assumptions (20) 
+ 
+IV Projection Results and Assumptions (23) 
+≪Projection Results for Medium-, High-, and Low-Fertility (Medium-Mortality)≫(23) 
+≪Projection Results for Medium-Fertility (Medium-, High-, and Low-Mortality)≫(35) 
+≪Comparison of Projection Results with Different Assumptions≫(41) 
+≪Assumptions≫(47) 
+≪Long-range Auxiliary Projections≫(55) 
+≪Projections for the Japanese Population and Fertility Assumptions≫(63) 
+≪Conditional Population Projections≫(71) 
+ 
+Appendix Total Population, population by the three age groups: 1950-2020 (79) 
+ 
+ 
+National Institute of Population and Social Security Research in Japan 
+https://www.ipss.go.jp/index-e.asp  
+
+ 
+ 
+List of Tables and Figures 
+ 
+Summary of Projection Results (medium-mortality projection) (19) 
+Summary of Fertility Assumptions (20) 
+Summary of Mortality Assumptions (21) 
+Summary of International Migration Assumptions (21) 
+ 
+[Projection Results for Medium-, High-, and Low-Fertility (Medium-Mortality)] 
+Table 1-1 Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and 
+age composition: Medium-fertility (medium-mortality) projection (25) 
+Table 1-2 Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and 
+age composition: High-fertility (medium-mortality) projection (26) 
+Table 1-3 Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and 
+age composition: Low-fertility (medium-mortality) projection (27) 
+Table 1-4 Mean age and dependency ratio (total population): Medium-, high-, and low-fertility (medium-
+mortality) projections (28) 
+Table 1-5 Number and rate of births, deaths and natural increase (total population): Medium-fertility (medium-
+mortality) projection (29) 
+Table 1-6 Number and rate of births, deaths and natural increase (total population): High-fertility (medium-
+mortality) projection (30) 
+Table 1-7 Number and rate of births, deaths and natural increase (total population): Low-fertility (medium-
+mortality) projection 310) 
+Figure 1-1 Actual and projected population of Japan: Medium-, high-, and low-fertility (medium-mortality) 
+projections (32) 
+Figure 1-2 Trends in the proportion of the population aged 65 and over: Medium-, high-, and low-fertility 
+(medium-mortality) projections (33) 
+Figure 1-3 Trends in the population of major three age groups: Medium-fertility (medium-mortality) 
+projections (33) 
+Figure 1-4 Trends in the proportion of major three age groups: Medium-fertility (medium-mortality) 
+projections (34) 
+Figure 1-5 Population pyramid (total population): Three fertility variant projections with a medium-mortality 
+assumption (34) 
+ 
+[Projection Results for Medium-Fertility (High- and Low-Mortality)] 
+Table 2-1 Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and 
+age composition: Medium-fertility (high-mortality) projection (37) 
+Table 2-2 Total population, population by the major three age groups (under 15, 15-64, and 65 and over), and 
+age composition: Medium-fertility (low-mortality) projection (38) 
+Table 2-3 Mean age and dependency ratio (total population): Medium-fertility (medium-, high-, and low-
+mortality) projections (39) 
+Figure 2-1 Actual and projected population of Japan: Medium-fertility (medium-, high, and low-mortality) 
+projections (40) 
+Figure 2-2 Trends in the proportion of the population aged 65 and over: Medium-fertility (medium-, high, and 
+low-mortality) projections (40) 
+ 
+[Comparison of Projection Results with Different Assumptions] 
+Table 3-1 Total population: Medium-, high-, and low-fertility (medium-, high-, and low-mortality) projections 
+(43) 
+</pre
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </main>
+    </div>
+  </body>
+</html>
