@@ -877,6 +877,40 @@ footer {
   border-radius: 3px;
 }
 
+.post-tldr {
+  background: var(--off);
+  border-left: 3px solid var(--text);
+  padding: 20px 24px;
+  margin: 32px 0;
+  border-radius: 6px;
+}
+
+.post-tldr-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-light);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.post-tldr-content {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-mid);
+}
+
+.post-tldr-content ul {
+  margin: 12px 0 0 20px;
+  padding: 0;
+  list-style: disc;
+}
+
+.post-tldr-content li {
+  margin-bottom: 8px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .hero-inner {

@@ -7,16 +7,30 @@ a pre-trained 20B model and no fine-tuning. Here is what we built, what worked, 
 the numbers might be hiding."
 ---
 
-![Frontier Research Agents](/image.png)
+![Frontier Research Agents](/current_frontier.png)
 
 _This reflects the state of [DeepResearch-Bench](https://huggingface.co/spaces/muset-ai/DeepResearch-Bench-Leaderboard) as of late March 2026. These numbers will almost certainly have moved by the time you read this, and that is a good thing for the field._
+
+<div class="post-tldr">
+  <div class="post-tldr-label">⚡ TL;DR</div>
+  <div class="post-tldr-content">
+  <a href="https://github.com/KabakaWilliam/trajectorykit" target="_blank"><strong>TrajectoryKit</strong></a> achieves competitive performance on deep research benchmarks without fine-tuning:
+    <ul>
+      <li><strong>Score:</strong> 55.08 on DeepResearch-Bench, competitive with frontier systems</li>
+      <li><strong>Model:</strong> Pre-trained GPT-OSS-20B model; no specialised fine-tuning</li>
+      <li><strong>Architecture:</strong> Focus on harness design, not model size</li>
+      <li><strong>Approach:</strong> Recursive delegation, verification pipelines, and fallback search strategies</li>
+      <li><strong>Key insight:</strong> Good system design can match larger, fine-tuned competitors</li>
+    </ul>
+  </div>
+</div>
 
 ## The Result That Made Us Look Twice
 
 Deep research agents are getting good [fast](https://hai.stanford.edu/ai-index). The chart
 above shows where things stood when we ran our evaluation: a cluster of proprietary systems
-bunched between 55.0 and 55.5, with nvidia aiq and [TrajectoryKit (Ours)](https://github.com/KabakaWilliam/trajectorykit) breaking away into the
-open source tier above 55.0, both approaching the 56.0 threshold that only CellCog Max has
+bunched between 55.0 and 55.5, with [nvidia aiq](https://github.com/NVIDIA-AI-Blueprints/aiq) and [TrajectoryKit (Ours)](https://github.com/KabakaWilliam/trajectorykit) breaking away into the
+open source tier above 55.0, both approaching the 56.0 threshold that only [CellCog Max](https://cellcog.ai/) has
 cleared at this time.
 
 What that position does not show is how we got there. TrajectoryKit is a pre-trained 20B
@@ -87,6 +101,14 @@ offline is still (mostly) reachable.
 and identifies multi-step dependencies, steps that require an earlier result before they
 can run. This prevents the agent from attempting synthesis before it has gathered the
 relevant evidence.
+
+**Code execution via isolated sandbox.** When the agent needs to compute, aggregate, or
+transform data during a research run, it generates Python code and dispatches it to a
+sandboxed execution environment via [SandboxFusion](https://bytedance.github.io/SandboxFusion/). Results are returned as base64-encoded
+strings, which the agent decodes and integrates into its findings for the next turn. This
+keeps arbitrary computation out of the main inference loop while giving the agent a genuine
+scratchpad for quantitative reasoning, something closer in spirit to how [Recursive Language Models](https://arxiv.org/abs/2512.24601) use
+intermediate computation via named variables.
 
 ---
 
