@@ -27,11 +27,18 @@ _This reflects the state of [DeepResearch-Bench](https://huggingface.co/spaces/m
 
 ## The Result That Made Us Look Twice
 
-Deep research agents are getting good [fast](https://hai.stanford.edu/ai-index). The chart
-above shows where things stood when we ran our evaluation: a cluster of proprietary systems
-bunched between 55.0 and 55.5, with [nvidia aiq](https://github.com/NVIDIA-AI-Blueprints/aiq) and [TrajectoryKit (Ours)](https://github.com/KabakaWilliam/trajectorykit) breaking away into the
-open source tier above 55.0, both approaching the 56.0 threshold that only [CellCog Max](https://cellcog.ai/) has
-cleared at this time.
+<div style="display: flex; justify-content: center;">
+  <img src="/friday_head_turn.gif" alt="Head turn animation" />
+</div>
+
+<br>
+
+Deep research agents are getting good [fast](https://hai.stanford.edu/ai-index).
+[TrajectoryKit (Ours)](https://github.com/KabakaWilliam/trajectorykit) scored **55.08**
+on [DeepResearch-Bench](https://deepresearch-bench.github.io/), ahead of every proprietary system in the figure above, and the
+highest score among open source systems that use no fine-tuning. Only [nvidia aiq](https://github.com/NVIDIA-AI-Blueprints/aiq), fine-tuned on research
+traces, and [CellCog Max](https://cellcog.ai/) (closed-source, proprietary) score higher
+overall, by less than 1 point.
 
 What that position does not show is how we got there. TrajectoryKit is a pre-trained 20B
 model in a simple loop with no fine-tuning on research traces. No weight modifications, no
@@ -48,9 +55,11 @@ This post is about what we found, and what we are still not sure about.
 
 ## What Is a Deep Research Agent?
 
-A deep research agent takes a hard question -- the kind that would take a human researcher
-several hours -- and autonomously searches, reads, synthesises, and writes a cited report.
-Think _"Why did this video go viral"_ rather than _"What is the capital of Uganda."_
+A deep research agent takes a hard question (the kind that would inspire a 7+ hour
+lock-in session to solve) and autonomously searches, reads, synthesises, and writes
+a cited report. Think _"What structural shifts in the music industry made it possible
+for a bedroom producer to outperform a major label release in 2024?"_ rather than
+_"Who produced Kendrick Lamar's last album?"_
 
 The difficulty is not **just** retrieval. It is also knowing what to look for, how to chain findings
 across sources, when a claim needs verification, and how to produce something useful rather
@@ -83,11 +92,25 @@ A few design decisions are worth highlighting:
 window. This prevents the well-known degradation that happens when long agentic loops
 accumulate noise in context. Workers return structured findings; the root synthesises.
 
-**A four-stage verification pipeline.** Before anything is published, the draft passes
-through a format gate, a quality audit against a pre-generated rubric, a spot-check stage
-where claims are extracted and independently verified by sub-agents, and a citation audit
-confirming that URLs actually support what is cited. Failure at any stage returns the draft
-to the research loop with targeted feedback.
+**A four-stage verification pipeline.** When the root agent believes it has completed
+enough research and drafting, it must call the `research_complete()` tool, which
+kickstarts the verification process.
+
+![Verification Pipeline](/verification_pipeline.png)
+_Using the initial rubric and the draft, we task the model with critiquing the format
+and content provided and generating structured feedback._
+
+The draft passes through a format gate, a quality audit against a pre-generated rubric,
+a spot-check stage where claims are extracted and independently verified by sub-agents,
+and a citation audit confirming that URLs actually resolve and support what is cited.
+Failure at any stage returns the draft to the research loop with targeted feedback.
+
+What we find most interesting about this design is that it opens up opportunities to
+study the effects of using a separate LLM as critic, or applying
+[self-critique](https://arxiv.org/abs/2512.24103) with the same model. It also
+creates natural routing points at the root level: for instance, using verification
+feedback to switch to a stronger model mid-trajectory, or **dynamically adapting the
+agent architecture based on failure mode.**
 
 **Three-tier search and four-tier fetch fallbacks.** Search cascades through
 [Serper](https://serper.dev), [Exa](https://exa.ai/), and [DuckDuckGo](https://duckduckgo.com/).
@@ -194,6 +217,24 @@ reasoning quality.
 
 ---
 
+## Eval Awareness: An Interesting Edge Case
+
+Early in this project, we observed a phenomenon similar to one documented by
+[Anthropic](https://www.anthropic.com/engineering/eval-awareness-browsecomp):
+our agent searched for and retrieved ground-truth answers directly from the
+hosting page of [DeepSearchQA](https://huggingface.co/datasets/google/deepsearchqa/viewer/deepsearchqa/),
+a Google deep search benchmark. The immediate fix is straightforward: block
+the domains hosting benchmark datasets. But the episode points to a deeper
+challenge: how do we reliably evaluate agents on long-horizon tasks when those
+agents are capable enough to locate and exploit the evaluation data itself?
+More
+troubling still, it raises the question of whether capable agents can now
+recognise benchmark-style questions and adjust their behaviour accordingly,
+even without access to the answers. Either way, it suggests that how we design and serve benchmarks may need
+to keep pace with the agents we are trying to evaluate.
+
+---
+
 ## What Did Not Work
 
 **Context bleed in long runs.** Even with fresh-context workers, the root agent's own
@@ -232,4 +273,4 @@ If you are working on agentic evaluation or building deep research agents, I wou
 hear from you.
 
 [GitHub](https://github.com/KabakaWilliam/trajectorykit) ·
-[Twitter](https://twitter.com/KabakaWilliam) ·
+[Twitter](https://twitter.com/William__Gitta) ·
