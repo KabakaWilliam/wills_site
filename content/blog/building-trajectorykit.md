@@ -1,6 +1,6 @@
 ---
 title: We Built a Competitive Deep Research Agent Without Fine-Tuning
-date: "2026-03-20"
+date: "2026-03-23"
 author: William Lugoloobi
 excerpt: "TrajectoryKit scores competitively against frontier deep research systems using
 a pre-trained 20B model and no fine-tuning. Here is what we built, what worked, and what
