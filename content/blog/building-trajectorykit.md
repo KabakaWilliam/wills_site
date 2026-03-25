@@ -274,3 +274,16 @@ hear from you.
 
 [GitHub](https://github.com/KabakaWilliam/trajectorykit) ·
 [Twitter](https://twitter.com/William__Gitta) ·
+
+---
+
+## To Cite This
+
+```bibtex
+@misc{lugoloobi2026trajectorykit,
+  author = {Lugoloobi, William},
+  title  = {We Built a Competitive Deep Research Agent Without Fine-Tuning},
+  year   = {2026},
+  url    = {https://williamlugoloobi.com/blog/building-trajectorykit}
+}
+```
