@@ -276,6 +276,11 @@ h2 {
   transform: translateX(3px);
 }
 
+/* ── Latest Article ── */
+#research {
+  background: #f7f5f7;
+}
+
 /* ── TrajectoryKit ── */
 .tk-section {
   background: var(--off);
