@@ -10,6 +10,34 @@ export function LatestArticle() {
 
         <FadeIn>
           <a
+            href="https://arxiv.org/abs/2605.14786"
+            target="_blank"
+            className="paper"
+          >
+            <div>
+              <div className="paper-title">
+                Known By Their Actions: Fingerprinting LLM Browser Agents via UI
+                Traces
+              </div>
+              <p className="paper-abstract">
+                Websites can silently fingerprint which LLM is powering a
+                browser agent just by observing its actions with an embedded
+                tracker
+              </p>
+              <div className="paper-meta">
+                arXiv:2605.14786 &nbsp;·&nbsp; Computer-use agents &nbsp;·&nbsp;
+                Security
+              </div>
+            </div>
+            <div>
+              <div className="paper-date">May 2026</div>
+              <span className="paper-arrow">→</span>
+            </div>
+          </a>
+        </FadeIn>
+
+        <FadeIn>
+          <a
             href="https://arxiv.org/abs/2602.09924"
             target="_blank"
             className="paper"
