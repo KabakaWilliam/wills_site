@@ -7,7 +7,7 @@ export function Navigation() {
     <header>
       <div className="header-inner">
         <Link href="/" className="site-name">
-          William Lugoloobi
+          WL
         </Link>
         <nav>
           <ul className="header-nav">
@@ -28,8 +28,9 @@ export function Navigation() {
                 href="/William_Gitta_Lugoloobi_CV.pdf"
                 className="nav-cv"
                 target="_blank"
+                rel="noopener noreferrer"
               >
-                CV ↗
+                CV
               </a>
             </li>
           </ul>

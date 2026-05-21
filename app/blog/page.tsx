@@ -1,5 +1,4 @@
 import { getBlogPosts } from "@/lib/blog";
-import { BlogList } from "@/components/blog-list";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 
@@ -14,11 +13,9 @@ export default async function BlogPage() {
           <div className="blog-header">
             <h1>Blog</h1>
             <p>
-              Writing on machine learning, agentic systems, and things I am
-              figuring out.
+              Writing on machine learning, agentic systems, and things I am figuring out.
             </p>
           </div>
-          <BlogList posts={posts} />
         </section>
       </main>
       <Footer />

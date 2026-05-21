@@ -1,37 +1,35 @@
 "use client";
 
+"use client";
+
 import { FadeIn } from "@/components/fade-in";
+import { ArrowRight } from "lucide-react";
 
 export function LatestArticle() {
   return (
-    <section id="research" className="section research">
+    <section id="research" className="section">
       <div className="container">
-        <p className="section-label">Research</p>
+        <span className="section-label">Research</span>
 
         <FadeIn>
           <a
             href="https://arxiv.org/abs/2605.14786"
             target="_blank"
+            rel="noopener noreferrer"
             className="paper"
           >
             <div>
               <div className="paper-title">
-                Known By Their Actions: Fingerprinting LLM Browser Agents via UI
-                Traces
+                Known By Their Actions: Fingerprinting LLM Browser Agents via UI Traces
               </div>
               <p className="paper-abstract">
-                Websites can silently fingerprint which LLM is powering a
-                browser agent just by observing its actions with an embedded
-                tracker
+                Websites silently fingerprint which LLM powers a browser agent just by observing its actions
               </p>
-              <div className="paper-meta">
-                arXiv:2605.14786 &nbsp;·&nbsp; Computer-use agents &nbsp;·&nbsp;
-                Security
-              </div>
+              <div className="paper-meta">arXiv:2605.14786 · Computer-use agents · Security</div>
             </div>
             <div>
-              <div className="paper-date">May 2026</div>
-              <span className="paper-arrow">→</span>
+              <span className="paper-date">May 2026</span>
+              <ArrowRight size={18} />
             </div>
           </a>
         </FadeIn>
@@ -40,27 +38,21 @@ export function LatestArticle() {
           <a
             href="https://arxiv.org/abs/2602.09924"
             target="_blank"
+            rel="noopener noreferrer"
             className="paper"
           >
             <div>
               <div className="paper-title">
-                LLMs Encode Their Failures: Predicting Success from
-                Pre-Generation Activations
+                LLMs Encode Their Failures: Predicting Success from Pre-Generation Activations
               </div>
               <p className="paper-abstract">
-                Language models&apos; internal representations contain signal
-                about whether they&apos;ll succeed on a task — before generation
-                begins. We show this can be extracted to route inference
-                efficiently, reducing costs while maintaining performance.
+                Internal representations predict task success before generation begins
               </p>
-              <div className="paper-meta">
-                ICLR LIT Workshop, 2026 &nbsp;·&nbsp; mechanistic
-                interpretability &nbsp;·&nbsp; inference routing
-              </div>
+              <div className="paper-meta">ICLR LIT 2026 · Mechanistic interpretability · Inference routing</div>
             </div>
             <div>
-              <div className="paper-date">Feb 2026</div>
-              <span className="paper-arrow">→</span>
+              <span className="paper-date">Feb 2026</span>
+              <ArrowRight size={18} />
             </div>
           </a>
         </FadeIn>
@@ -69,6 +61,7 @@ export function LatestArticle() {
           <a
             href="https://arxiv.org/abs/2510.18147"
             target="_blank"
+            rel="noopener noreferrer"
             className="paper"
           >
             <div>
@@ -76,19 +69,13 @@ export function LatestArticle() {
                 LLMs Encode How Difficult Problems Are
               </div>
               <p className="paper-abstract">
-                LLMs linearly represent the difficulty of math and coding
-                problems in their activation space. This geometric structure has
-                implications for adaptive inference, curriculum learning, and
-                understanding model confidence.
+                Models represent problem difficulty in activation space through geometric structure
               </p>
-              <div className="paper-meta">
-                arXiv:2510.18147 &nbsp;·&nbsp; representation learning
-                &nbsp;·&nbsp; probing
-              </div>
+              <div className="paper-meta">arXiv:2510.18147 · Representation learning · Probing</div>
             </div>
             <div>
-              <div className="paper-date">Oct 2025</div>
-              <span className="paper-arrow">→</span>
+              <span className="paper-date">Oct 2025</span>
+              <ArrowRight size={18} />
             </div>
           </a>
         </FadeIn>
