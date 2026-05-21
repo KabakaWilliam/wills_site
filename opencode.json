@@ -1,0 +1,29 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "vllm/Qwen/Qwen3.5-9B",
+  "provider": {
+    "vllm": {
+      "npm": "@ai-sdk/anthropic",
+      "name": "Local vLLM",
+      "options": {
+        "baseURL": "http://127.0.0.1:1738/v1",
+        "apiKey": "local-vllm-key"
+      },
+      "models": {
+        "Qwen/Qwen3.5-9B": {
+          "name": "Qwen3.5 9B via vLLM",
+          "modalities": {
+            "input":[
+              "text",
+              "image"
+            ],
+            "output":[
+              "text"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "permission": "allow"
+}

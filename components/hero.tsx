@@ -4,7 +4,7 @@ import { logToNtfy } from "@/app/actions";
 
 export function Hero() {
   return (
-    <section className="hero-section bg-[#f7f7f5]">
+    <section className="hero-section">
       <div className="container">
         <div className="hero-inner">
           <div className="hero-text">
@@ -15,13 +15,14 @@ export function Hero() {
             </h1>
             <p className="hero-bio">
               I&apos;m a 2nd-year PhD student at the{" "}
-              <a href="https://www.oii.ox.ac.uk/" target="_blank">
+              <a href="https://www.oii.ox.ac.uk/" target="_blank" rel="noopener noreferrer">
                 Oxford Internet Institute
               </a>
               , advised by{" "}
               <a
                 href="https://www.oii.ox.ac.uk/people/profiles/joss-wright/"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Joss Wright
               </a>{" "}
@@ -29,6 +30,7 @@ export function Hero() {
               <a
                 href="https://www.oii.ox.ac.uk/people/profiles/chris-russell/"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Chris Russell
               </a>
@@ -37,9 +39,9 @@ export function Hero() {
               task over long horizons.
             </p>
             <div className="hero-pills">
-              <span className="pill">AI Safety</span>
-              <span className="pill">Agentic Systems</span>
-              <span className="pill">Interpretability</span>
+              <a href="#" className="pill">AI Safety</a>
+              <a href="#" className="pill">Agentic Systems</a>
+              <a href="#" className="pill">Interpretability</a>
             </div>
           </div>
           <div className="hero-image">
