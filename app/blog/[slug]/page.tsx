@@ -49,9 +49,11 @@ export default async function BlogPostPage({
       <main>
         <article className="blog-post">
           <header className="post-header">
-            <Link href="/blog" className="back-link">
-              ← Back to Blog
-            </Link>
+            <nav className="breadcrumb-nav">
+              <Link href="/blog" className="back-link">
+                back to blog
+              </Link>
+            </nav>
             <h1>{post.title}</h1>
             <div className="post-meta">
               <time dateTime={post.date}>
@@ -62,7 +64,7 @@ export default async function BlogPostPage({
                 })}
               </time>
               {post.author && (
-                <span className="post-author">by {post.author}</span>
+                <span className="post-author">| by {post.author}</span>
               )}
             </div>
           </header>
