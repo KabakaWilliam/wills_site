@@ -44,35 +44,33 @@ export default async function BlogPostPage({
   }
 
   return (
-    <>
+    <main className="blog-post">
       <Navigation />
-      <main>
-        <article className="blog-post">
-          <header className="post-header">
-            <Link href="/blog" className="back-link">
-              ← Back to Blog
-            </Link>
-            <h1>{post.title}</h1>
-            <div className="post-meta">
-              <time dateTime={post.date}>
-                {new Date(post.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-              {post.author && (
-                <span className="post-author">by {post.author}</span>
-              )}
-            </div>
-          </header>
-          <div
-            className="post-content"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        </article>
-      </main>
+      <article>
+        <header className="post-header">
+          <Link href="/blog" className="back-link">
+            ← BACK TO BLOG
+          </Link>
+          <h1>{post.title}</h1>
+          <div className="post-meta">
+            <time dateTime={post.date}>
+              {new Date(post.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+            {post.author && (
+              <span className="post-author">by {post.author}</span>
+            )}
+          </div>
+        </header>
+        <div
+          className="post-content"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+      </article>
       <Footer />
-    </>
+    </main>
   );
 }
