@@ -121,14 +121,14 @@ export function TrajectoryKit() {
           <a
             href="https://github.com/KabakaWilliam/trajectorykit"
             target="_blank"
-            className="cta-primary"
+            className="cta-method primary"
           >
             GitHub →
           </a>
           <a
             href="https://pypi.org/project/trajectorykit/"
             target="_blank"
-            className="cta-secondary"
+            className="cta-method secondary"
           >
             PyPI
           </a>

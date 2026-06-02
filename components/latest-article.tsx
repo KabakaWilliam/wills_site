@@ -4,7 +4,7 @@ import { FadeIn } from "@/components/fade-in";
 
 export function LatestArticle() {
   return (
-    <section id="research" className="section research">
+    <section id="research" className="section">
       <div className="container">
         <p className="section-label">Research</p>
 
