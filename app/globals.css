@@ -35,21 +35,21 @@
   --font-weight-bold: 700;
 }
 
-:root {
-  /* Anthropic-inspired color palette */
-  --bg-primary: #3d3d3a;       /* Dark gray-brown main bg */
-  --bg-secondary: #141413;     /* Nearly black footer/modals */
-  --bg-mid: #4a4a45;           /* Slightly lighter depth */
+ :root {
+  /* Warm off-white Anthropic-inspired color palette */
+  --bg-primary: #FAF9F6;       /* Warm off-white main bg */
+  --bg-secondary: #F5F5F4;     /* Warm lighter footer/modals */
+  --bg-mid: #F4F4F0;           /* Faint depth */
   
-  --text-primary: #f0eee6;     /* off-white primary text */
-  --text-secondary: #b0aea5;   /* muted secondary */
-  --text-tertiary: #888882;    /* Additional muted */
+  --text-primary: #171717;     /* Deep charcoal primary text */
+  --text-secondary: #525252;   /* Warm gray secondary */
+   --text-tertiary: #666666;    /* Medium gray */
   
-  --accent: #d97757;           /* Terra cotta accent CTA */
+   --accent: #D95E45;           /* Terracotta/coral - slightly brighter */
   --accent-hover: #c96a47;     /* Darker accent for hover */
   
-  --border: #87867f;           /* Muted border color */
-  --border-light: rgba(255, 255, 255, 0.1);
+   --border: #E8E4E1;           /* Light warm border */
+  --border-light: rgba(0, 0, 0, 0.04);
 }
 
 *,
@@ -140,18 +140,33 @@ border-radius-none {
   animation: pulse-slow 1.5s ease-in-out infinite;
 }
 
-/* Subtle shadows per Anthropic language */
+ /* Subtle shadows per Anthropic language */
 /* Very minimal — only on elevation */
+:root {
+  --shadow-base: rgba(0, 0, 0, 0.08);
+  shadow-sm-light: box-shadow: 0 2px 16px var(--shadow-base);
+  shadow-md-light: box-shadow: 0 4px 24px var(--shadow-base);
+  shadow-lg-light: box-shadow: 0 12px 48px var(--shadow-base);
+}
+
 shadow-sm-light {
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 16px var(--shadow-base);
 }
 
 shadow-md-light {
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 24px var(--shadow-base);
 }
 
 shadow-lg-light {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 48px var(--shadow-base);
+}
+
+shadow-md-light {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+shadow-lg-light {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.10);
 }
 
 /* Anthropic-style card with light border */
@@ -529,8 +544,8 @@ h2 {
 }
 
 /* Terminal-like line styling */
-.trace-card:not(:hover) .trace-line:hover {
-  background: transparent;
+ .trace-card:not(:hover) .trace-line:hover {
+  background: var(--bg-secondary);
 }
 
 .trace-card:hover .trace-line:not(:last-child):hover {

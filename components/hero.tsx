@@ -4,7 +4,7 @@ import { logToNtfy } from "@/app/actions";
 
 export function Hero() {
   return (
-    <section className="hero-section bg-[#141413]">
+    <section className="hero-section">
       <div className="container">
         <div className="hero-inner">
           <div className="hero-text">
