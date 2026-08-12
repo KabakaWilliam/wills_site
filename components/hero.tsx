@@ -32,8 +32,7 @@ export function Hero() {
               >
                 Chris Russell
               </a>
-              . I&apos;m also a Research Scientist Intern at Thomson Reuters,
-              working on post-training and harness optimisation for agents. My
+              .My
               research explores how language models internally represent their
               own limitations, and how to build AI agents that stay safe and on
               task over long horizons.
