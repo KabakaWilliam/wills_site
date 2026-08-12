@@ -13,7 +13,7 @@ export const papers = [
       "LLMs Encode Their Failures: Predicting Success from Pre-Generation Activations",
     abstract:
       "Language models’ internal representations contain signal about whether they’ll succeed on a task before generation begins. We use it to route inference efficiently while maintaining performance.",
-    meta: "ICLR LIT Workshop, 2026 · Mechanistic interpretability · Inference routing",
+    meta: "COLM 2026 · Mechanistic interpretability · Inference routing",
     date: "Feb 2026",
     href: "https://arxiv.org/abs/2602.09924",
   },
@@ -29,7 +29,21 @@ export const papers = [
 
 export const news = [
   {
-    date: "2026",
+    date: "Aug 2026",
+    title: "LLMs Encode Their Failures accepted to COLM",
+    body: "Our work shows that models encode whether they will succeed before generation begins, enabling more efficient inference routing.",
+    href: "https://arxiv.org/abs/2602.09924",
+    linkLabel: "Read the paper",
+  },
+  {
+    date: "3 Aug 2026",
+    title: "Joined Thomson Reuters as a Research Scientist Intern",
+    body: "Working on post-training and harness optimisation for agents.",
+    href: "https://www.thomsonreuters.com/",
+    linkLabel: "Thomson Reuters",
+  },
+  {
+    date: "Jul 2026",
     title: "Launched Pidge",
     body: "A live watchlist for Oxford college roles, with alerts for the opportunities and deadlines you care about.",
     href: "https://pidge.watch",
@@ -40,13 +54,6 @@ export const news = [
     title: "New paper on browser-agent fingerprinting",
     body: "We show that websites can identify the model behind an LLM browser agent from its UI traces.",
     href: "https://arxiv.org/abs/2605.14786",
-    linkLabel: "Read the paper",
-  },
-  {
-    date: "Feb 2026",
-    title: "Work accepted to the ICLR LIT Workshop",
-    body: "Our work on predicting model success from pre-generation activations will appear at ICLR 2026.",
-    href: "https://arxiv.org/abs/2602.09924",
     linkLabel: "Read the paper",
   },
 ] as const;

@@ -32,13 +32,16 @@ export function Hero() {
               >
                 Chris Russell
               </a>
-              . My work explores how language models internally represent their
+              . I&apos;m also a Research Scientist Intern at Thomson Reuters,
+              working on post-training and harness optimisation for agents. My
+              research explores how language models internally represent their
               own limitations, and how to build AI agents that stay safe and on
               task over long horizons.
             </p>
             <div className="hero-pills">
               <span className="pill">AI Safety</span>
               <span className="pill">Agentic Systems</span>
+              <span className="pill">Post-training</span>
               <span className="pill">Interpretability</span>
             </div>
             <a className="hero-now" href="https://pidge.watch" target="_blank" rel="noreferrer">
