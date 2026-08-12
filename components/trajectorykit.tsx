@@ -4,9 +4,9 @@ import { FadeIn } from "@/components/fade-in";
 
 export function TrajectoryKit() {
   return (
-    <section id="projects" className="section tk-section">
+    <section className="section tk-section">
       <div className="container">
-        <p className="section-label">Projects</p>
+        <p className="section-label">Open-source project</p>
         <h2>TrajectoryKit</h2>
         <p className="tk-intro">
           A <strong>local-first agentic framework</strong> for running AI agents

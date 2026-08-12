@@ -45,7 +45,7 @@ export function ContactSection() {
                   </a>
                 </li>
                 <li>
-                  <a href="/William_Gitta_Lugoloobi_CV.pdf">
+                  <a href="/cv" target="_blank">
                     CV (PDF) <span className="ext">↓</span>
                   </a>
                 </li>

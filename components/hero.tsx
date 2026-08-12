@@ -41,6 +41,11 @@ export function Hero() {
               <span className="pill">Agentic Systems</span>
               <span className="pill">Interpretability</span>
             </div>
+            <a className="hero-now" href="https://pidge.watch" target="_blank" rel="noreferrer">
+              <span>Now</span>
+              Pidge is live — never miss an Oxford college role
+              <i aria-hidden="true">↗</i>
+            </a>
           </div>
           <div className="hero-image">
             {/* eslint-disable-next-line @next/next/no-img-element */}

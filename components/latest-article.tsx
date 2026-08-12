@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn } from "@/components/fade-in";
+import { papers } from "@/lib/site-content";
 
 export function LatestArticle() {
   return (
@@ -8,90 +9,21 @@ export function LatestArticle() {
       <div className="container">
         <p className="section-label">Research</p>
 
-        <FadeIn>
-          <a
-            href="https://arxiv.org/abs/2605.14786"
-            target="_blank"
-            className="paper"
-          >
-            <div>
-              <div className="paper-title">
-                Known By Their Actions: Fingerprinting LLM Browser Agents via UI
-                Traces
+        {papers.map((paper) => (
+          <FadeIn key={paper.href}>
+            <a href={paper.href} target="_blank" rel="noreferrer" className="paper">
+              <div>
+                <div className="paper-title">{paper.title}</div>
+                <p className="paper-abstract">{paper.abstract}</p>
+                <div className="paper-meta">{paper.meta}</div>
               </div>
-              <p className="paper-abstract">
-                Websites can silently fingerprint which LLM is powering a
-                browser agent just by observing its actions with an embedded
-                tracker
-              </p>
-              <div className="paper-meta">
-                arXiv:2605.14786 &nbsp;·&nbsp; Computer-use agents &nbsp;·&nbsp;
-                Security
+              <div>
+                <div className="paper-date">{paper.date}</div>
+                <span className="paper-arrow">→</span>
               </div>
-            </div>
-            <div>
-              <div className="paper-date">May 2026</div>
-              <span className="paper-arrow">→</span>
-            </div>
-          </a>
-        </FadeIn>
-
-        <FadeIn>
-          <a
-            href="https://arxiv.org/abs/2602.09924"
-            target="_blank"
-            className="paper"
-          >
-            <div>
-              <div className="paper-title">
-                LLMs Encode Their Failures: Predicting Success from
-                Pre-Generation Activations
-              </div>
-              <p className="paper-abstract">
-                Language models&apos; internal representations contain signal
-                about whether they&apos;ll succeed on a task — before generation
-                begins. We show this can be extracted to route inference
-                efficiently, reducing costs while maintaining performance.
-              </p>
-              <div className="paper-meta">
-                ICLR LIT Workshop, 2026 &nbsp;·&nbsp; mechanistic
-                interpretability &nbsp;·&nbsp; inference routing
-              </div>
-            </div>
-            <div>
-              <div className="paper-date">Feb 2026</div>
-              <span className="paper-arrow">→</span>
-            </div>
-          </a>
-        </FadeIn>
-
-        <FadeIn>
-          <a
-            href="https://arxiv.org/abs/2510.18147"
-            target="_blank"
-            className="paper"
-          >
-            <div>
-              <div className="paper-title">
-                LLMs Encode How Difficult Problems Are
-              </div>
-              <p className="paper-abstract">
-                LLMs linearly represent the difficulty of math and coding
-                problems in their activation space. This geometric structure has
-                implications for adaptive inference, curriculum learning, and
-                understanding model confidence.
-              </p>
-              <div className="paper-meta">
-                arXiv:2510.18147 &nbsp;·&nbsp; representation learning
-                &nbsp;·&nbsp; probing
-              </div>
-            </div>
-            <div>
-              <div className="paper-date">Oct 2025</div>
-              <span className="paper-arrow">→</span>
-            </div>
-          </a>
-        </FadeIn>
+            </a>
+          </FadeIn>
+        ))}
       </div>
     </section>
   );

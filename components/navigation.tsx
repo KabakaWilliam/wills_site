@@ -15,6 +15,9 @@ export function Navigation() {
               <a href="/#research">Research</a>
             </li>
             <li>
+              <a href="/#news">News</a>
+            </li>
+            <li>
               <a href="/#projects">Projects</a>
             </li>
             <li>
@@ -25,7 +28,7 @@ export function Navigation() {
             </li>
             <li>
               <a
-                href="/William_Gitta_Lugoloobi_CV.pdf"
+                href="/cv"
                 className="nav-cv"
                 target="_blank"
               >

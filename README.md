@@ -1,4 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# William Lugoloobi — personal site
+
+The homepage content shared by the research and news sections lives in
+`lib/site-content.ts`. Add a paper there once; the research list and future
+content tooling can consume the same typed record.
+
+## Keeping the CV current
+
+Every CV link on the site points to `/cv`. By default this redirects to the PDF
+in `public/`, so old bookmarks remain valid. To serve the current compiled CV
+without replacing that file on every update, set this deployment environment
+variable:
+
+```text
+CV_PDF_URL=https://your-stable-direct-link-to/the-latest-cv.pdf
+```
+
+Recommended options:
+
+1. Publish the compiled PDF from the CV's GitHub repository (for example as a
+   release asset) and use its stable URL as `CV_PDF_URL`.
+2. If the Overleaf project has Git integration, pull/compile it in CI and
+   publish the resulting PDF at a stable URL. Overleaf Git/GitHub integration is
+   a premium feature, and Overleaf-to-GitHub sync is initiated from Overleaf
+   rather than fully automatic.
+
+Do not put an Overleaf authentication token in `CV_PDF_URL` or commit one to
+this repository.
 
 ## Getting Started
 
