@@ -30,7 +30,12 @@ export function Hero() {
               </a>
               . My research spans model self-knowledge, post-training, and
               harness optimisation for long-horizon agents. I&apos;m currently a
-              Research Scientist Intern at Thomson Reuters.
+              Research Scientist Intern at {" "}
+              <a href="https://www.thomsonreuters.com/en/artificial-intelligence/ai-overview"
+              target="_blank">
+
+              Thomson Reuters.
+              </a>
             </p>
             <div className="hero-actions">
               <a href="#research">Selected publications ↓</a>
