@@ -8,10 +8,9 @@ export function Hero() {
       <div className="container">
         <div className="academic-hero-grid">
           <div>
-            <p className="hero-kicker">Oxford Internet Institute · Thomson Reuters</p>
-            <h1>I study how to build <em>reliable AI agents</em>—and the models behind them.</h1>
+            <h1>I train and build <em>reliable AI agents.</em></h1>
             <p className="hero-intro">
-              I&apos;m <strong>William Lugoloobi</strong>, a 2nd-year PhD student at the{" "}
+              I&apos;m <strong>William Lugoloobi</strong>, a third-year PhD student at the{" "}
               <a href="https://www.oii.ox.ac.uk/" target="_blank">
                 Oxford Internet Institute
               </a>
@@ -29,9 +28,9 @@ export function Hero() {
               >
                 Chris Russell
               </a>
-              . I&apos;m also a Research Scientist Intern at Thomson Reuters,
-              working across model self-knowledge, post-training, and harness
-              optimisation for long-horizon agents.
+              . My research spans model self-knowledge, post-training, and
+              harness optimisation for long-horizon agents. I&apos;m currently a
+              Research Scientist Intern at Thomson Reuters.
             </p>
             <div className="hero-actions">
               <a href="#research">Selected publications ↓</a>

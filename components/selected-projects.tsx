@@ -15,10 +15,11 @@ export function SelectedProjects() {
                   <span className="project-name">pidge.watch</span>
                   <span className="project-status"><i /> Live</span>
                 </div>
-                <h2>Never miss an Oxford college role.</h2>
+                <h2>Cmd+F for every Oxford college role.</h2>
                 <p>
-                  A focused role watchlist that monitors official vacancy pages
-                  and alerts people to matching opportunities and deadlines.
+                  Search roles across Oxford colleges in one place, then follow
+                  the opportunities and perks you care about—from accommodation
+                  and pay to the deadlines that matter.
                 </p>
               </div>
               <a href="https://pidge.watch" target="_blank" rel="noreferrer">

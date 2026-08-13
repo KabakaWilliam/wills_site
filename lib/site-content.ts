@@ -45,7 +45,7 @@ export const news = [
   {
     date: "Jul 2026",
     title: "Launched Pidge",
-    body: "A live watchlist for Oxford college roles, with alerts for the opportunities and deadlines you care about.",
+    body: "Search Oxford college roles in one place and follow the opportunities, perks, and deadlines you care about.",
     href: "https://pidge.watch",
     linkLabel: "Visit pidge.watch",
   },
