@@ -20,14 +20,17 @@ export function SelectedProjects() {
             >
               <div>
                 <div className="project-card-header">
-                  <span className="project-name">pidge.watch</span>
                   <span className="project-status"><i /> Live</span>
                 </div>
-                <h2>Cmd+F for every Oxford college role.</h2>
-                <p>
-                  Search roles across Oxford colleges in one place, then follow
-                  the opportunities and perks you care about—from accommodation
-                  and pay to the deadlines that matter.
+                <h2>pidge.watch</h2>
+                <p className="project-proposition">
+                  Tell us what Oxford role you want. Know when it appears.
+                </p>
+                <p className="project-description">
+                  Oxford jobs are scattered across dozens of college sites and
+                  can appear without warning. Tell Pidge the role, college, or
+                  perk you want—it watches for matches and alerts you the moment
+                  one appears.
                 </p>
               </div>
               <span className="project-card-link">Visit Pidge <i aria-hidden="true">↗</i></span>
@@ -44,11 +47,11 @@ export function SelectedProjects() {
             >
               <div>
                 <div className="project-card-header">
-                  <span className="project-name">TrajectoryKit</span>
                   <span className="project-status">Open source</span>
                 </div>
-                <h2>Local-first agent observability.</h2>
-                <p>
+                <h2>TrajectoryKit</h2>
+                <p className="project-proposition">Local-first agent observability.</p>
+                <p className="project-description">
                   Run agents on your own hardware and inspect every turn, tool
                   call, reasoning chain, and sub-agent trace.
                 </p>

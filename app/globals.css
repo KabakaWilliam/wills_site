@@ -1386,15 +1386,9 @@ footer {
 
 .project-card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  gap: 18px;
-}
-
-.project-name {
-  color: var(--accent);
-  font-family: var(--font-serif);
-  font-size: 17px;
+  min-height: 18px;
 }
 
 .project-status {
@@ -1416,16 +1410,26 @@ footer {
 }
 
 .project-card h2 {
-  margin: 25px 0 10px;
-  font-size: 28px;
+  margin: 20px 0 8px;
+  color: var(--accent);
+  font-size: 32px;
   font-weight: 400;
-  line-height: 1.25;
+  line-height: 1.15;
 }
 
-.project-card p {
+.project-proposition {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 21px;
+  line-height: 1.35;
+  max-width: 34ch;
+}
+
+.project-card .project-description {
+  margin-top: 16px;
   color: var(--text-mid);
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.65;
   max-width: 52ch;
 }
 
