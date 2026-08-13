@@ -25,7 +25,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "William Lugoloobi",
   description:
-    "I research how to make Agentic systems secure and reliable in my PhD @ Oxford",
+    "Oxford researcher studying reliable AI agents, model self-knowledge, post-training, and agent harness optimisation.",
   icons: {
     icon: "/star.svg",
   },

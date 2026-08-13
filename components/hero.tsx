@@ -4,17 +4,14 @@ import { logToNtfy } from "@/app/actions";
 
 export function Hero() {
   return (
-    <section className="hero-section bg-[#f7f7f5]">
+    <section className="academic-hero">
       <div className="container">
-        <div className="hero-inner">
-          <div className="hero-text">
-            <h1>
-              Hi, I&apos;m
-              <br />
-              <em>William</em>
-            </h1>
-            <p className="hero-bio">
-              I&apos;m a 2nd-year PhD student at the{" "}
+        <div className="academic-hero-grid">
+          <div>
+            <p className="hero-kicker">Oxford Internet Institute · Thomson Reuters</p>
+            <h1>I study how to build <em>reliable AI agents</em>—and the models behind them.</h1>
+            <p className="hero-intro">
+              I&apos;m <strong>William Lugoloobi</strong>, a 2nd-year PhD student at the{" "}
               <a href="https://www.oii.ox.ac.uk/" target="_blank">
                 Oxford Internet Institute
               </a>
@@ -32,26 +29,20 @@ export function Hero() {
               >
                 Chris Russell
               </a>
-              .My
-              research explores how language models internally represent their
-              own limitations, and how to build AI agents that stay safe and on
-              task over long horizons.
+              . I&apos;m also a Research Scientist Intern at Thomson Reuters,
+              working across model self-knowledge, post-training, and harness
+              optimisation for long-horizon agents.
             </p>
-            <div className="hero-pills">
-              <span className="pill">AI Safety</span>
-              <span className="pill">Agentic Systems</span>
-              <span className="pill">Post-training</span>
-              <span className="pill">Interpretability</span>
+            <div className="hero-actions">
+              <a href="#research">Selected publications ↓</a>
+              <a href="https://scholar.google.com/citations?user=_lcpYZkAAAAJ&hl=en" target="_blank" rel="noreferrer">Google Scholar ↗</a>
+              <a href="https://github.com/KabakaWilliam" target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>
-            <a className="hero-now" href="https://pidge.watch" target="_blank" rel="noreferrer">
-              <span>Now</span>
-              Pidge is live — never miss an Oxford college role
-              <i aria-hidden="true">↗</i>
-            </a>
           </div>
-          <div className="hero-image">
+          <div className="academic-portrait">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/note_hero.png" alt="William Lugoloobi" />
+            <span>Oxford · London</span>
           </div>
         </div>
       </div>

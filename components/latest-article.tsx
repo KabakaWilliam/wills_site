@@ -7,7 +7,10 @@ export function LatestArticle() {
   return (
     <section id="research" className="section research">
       <div className="container">
-        <p className="section-label">Research</p>
+        <div className="section-heading-row">
+          <p className="section-label">Selected publications</p>
+          <a className="section-link" href="https://scholar.google.com/citations?user=_lcpYZkAAAAJ&hl=en" target="_blank" rel="noreferrer">All on Scholar ↗</a>
+        </div>
 
         {papers.map((paper) => (
           <FadeIn key={paper.href}>
@@ -17,10 +20,7 @@ export function LatestArticle() {
                 <p className="paper-abstract">{paper.abstract}</p>
                 <div className="paper-meta">{paper.meta}</div>
               </div>
-              <div>
-                <div className="paper-date">{paper.date}</div>
-                <span className="paper-arrow">→</span>
-              </div>
+              <span className="paper-link">Paper ↗</span>
             </a>
           </FadeIn>
         ))}

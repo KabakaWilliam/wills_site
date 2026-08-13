@@ -14,16 +14,11 @@ export function News() {
         <div className="news-list">
           {news.map((item) => (
             <FadeIn key={`${item.date}-${item.title}`}>
-              <article className="news-item">
+              <a className="news-item" href={item.href} target="_blank" rel="noreferrer">
                 <time>{item.date}</time>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </div>
-                <a href={item.href} target="_blank" rel="noreferrer">
-                  {item.linkLabel} <span aria-hidden="true">↗</span>
-                </a>
-              </article>
+                <p><strong>{item.title}</strong> <span>{item.body}</span></p>
+                <i aria-hidden="true">↗</i>
+              </a>
             </FadeIn>
           ))}
         </div>
