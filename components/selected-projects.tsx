@@ -5,11 +5,19 @@ import { FadeIn } from "@/components/fade-in";
 export function SelectedProjects() {
   return (
     <section id="projects" className="section projects-section">
+      <div className="projects-backdrop projects-backdrop-pidge" aria-hidden="true" />
+      <div className="projects-backdrop projects-backdrop-trajectory" aria-hidden="true" />
       <div className="container">
         <p className="section-label">Selected projects</p>
         <div className="project-grid">
           <FadeIn>
-            <article className="project-card project-card-featured">
+            <a
+              className="project-card project-card-featured project-card-pidge"
+              href="https://pidge.watch"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Visit Pidge"
+            >
               <div>
                 <div className="project-card-header">
                   <span className="project-name">pidge.watch</span>
@@ -22,14 +30,18 @@ export function SelectedProjects() {
                   and pay to the deadlines that matter.
                 </p>
               </div>
-              <a href="https://pidge.watch" target="_blank" rel="noreferrer">
-                Visit Pidge <span aria-hidden="true">↗</span>
-              </a>
-            </article>
+              <span className="project-card-link">Visit Pidge <i aria-hidden="true">↗</i></span>
+            </a>
           </FadeIn>
 
           <FadeIn>
-            <article className="project-card">
+            <a
+              className="project-card project-card-trajectory"
+              href="https://github.com/KabakaWilliam/trajectorykit"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="View TrajectoryKit on GitHub"
+            >
               <div>
                 <div className="project-card-header">
                   <span className="project-name">TrajectoryKit</span>
@@ -41,11 +53,11 @@ export function SelectedProjects() {
                   call, reasoning chain, and sub-agent trace.
                 </p>
               </div>
-              <div className="project-links">
-                <a href="https://github.com/KabakaWilliam/trajectorykit" target="_blank" rel="noreferrer">GitHub ↗</a>
-                <a href="https://pypi.org/project/trajectorykit/" target="_blank" rel="noreferrer">PyPI ↗</a>
+              <div className="project-card-footer">
+                <span className="project-result"><i aria-hidden="true">🏆</i> #6 on DeepResearch Bench</span>
+                <span className="project-card-link">GitHub <i aria-hidden="true">↗</i></span>
               </div>
-            </article>
+            </a>
           </FadeIn>
         </div>
       </div>
