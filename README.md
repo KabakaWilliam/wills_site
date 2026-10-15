@@ -50,9 +50,10 @@ The homepage uses system reading fonts. Fonts used elsewhere are self-hosted in
 
 ## Interaction analytics
 
-Game and meadow interactions have event hooks; production custom-event sending
-is currently disabled on Vercel Hobby. See [the analytics setup notes](design/analytics.md)
-for event definitions, privacy choices, and activation requirements.
+Game and meadow interactions are sent to the
+[GoatCounter dashboard](https://willgitta.goatcounter.com/); Vercel continues to
+handle page views. See [the analytics notes](design/analytics.md) for event
+definitions, privacy choices, and testing instructions.
 
 ## Learn More
 
