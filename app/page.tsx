@@ -39,7 +39,7 @@ export default function Home() {
           <section className="bio" aria-label="About William">
             <IntroLandscape>
             <p className="lead">I train and build reliable AI agents.</p>
-            <p>I'm a third-year PhD student at the <a href="https://www.oii.ox.ac.uk/">Oxford Internet Institute</a>, advised by <a href="https://www.oii.ox.ac.uk/people/profiles/joss-wright/">Joss Wright</a> and <a href="https://www.oii.ox.ac.uk/people/profiles/chris-russell/">Chris Russell</a>. I study what models know about their own capabilities. I use that knowledge to make agents more reliable on long-horizon tasks.</p>
+            <p>I'm a third-year PhD student at the <a href="https://www.oii.ox.ac.uk/">Oxford Internet Institute</a>, advised by <a href="https://www.oii.ox.ac.uk/people/profiles/joss-wright/">Joss Wright</a> and <a href="https://www.oii.ox.ac.uk/people/profiles/chris-russell/">Chris Russell</a>. My research explores what models know about their own capabilities, and how that can help agents stay reliable over longer tasks.</p>
             <p>I'm also a Research Scientist Intern at <a href="https://www.thomsonreuters.com/en/artificial-intelligence/ai-overview">Thomson Reuters</a>, working on post-training and harness optimisation for agents.</p>
             <ProfileLinks className="elsewhere" />
             </IntroLandscape>
