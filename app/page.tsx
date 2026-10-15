@@ -4,6 +4,7 @@ import { ProfileLinks } from "@/components/profile-links";
 import { AcademicInteractions } from "@/components/academic-interactions";
 import { Honeypot } from "@/components/honeypot";
 import { IntroLandscape } from "@/components/intro-landscape";
+import { ProjectPixel } from "@/components/project-pixel";
 import { papers } from "@/lib/site-content";
 import "./academic-home.css";
 
@@ -52,7 +53,11 @@ export default function Home() {
             <ul className="papers">
               {papers.map(paper => (
                 <li key={paper.href}>
-                  <h3><a href={paper.href}>{paper.title}</a><span className={"venue-label" + (paper.preprint ? " venue-label--preprint" : "")}>{paper.venue}</span></h3>
+                  <div className="paper-topline">
+                    <span className={"venue-label" + (paper.preprint ? " venue-label--preprint" : "")}>{paper.venue}</span>
+                    <a className="paper-read" href={paper.href} aria-label={"Read paper: " + paper.title}>Read paper <span aria-hidden="true">↗</span></a>
+                  </div>
+                  <h3><a href={paper.href}>{paper.title}</a></h3>
                   <p className="paper-authors">{paper.authors.map((author, index) => (
                     <Fragment key={author}>{index > 0 ? ", " : ""}{author === "William Lugoloobi" ? <strong>{author}</strong> : author}</Fragment>
                   ))}</p>
@@ -64,17 +69,27 @@ export default function Home() {
 
           <section id="projects" aria-labelledby="projects-title">
             <h2 id="projects-title">Things I'm building</h2>
-            <p className="section-intro">I also build things I wish existed.</p>
+            <p className="section-intro">I build things I wish existed.</p>
             <ul className="projects">
-              <li>
-                <h3><a href="https://pidge.watch">pidge.watch</a></h3>
-                <p className="project-summary">Tell us what Oxford role you want. Know when it appears.</p>
-                <p className="project-summary">Oxford jobs are scattered across college sites. Pidge brings them together and alerts you when a matching opportunity appears.</p>
+              <li className="project-feature">
+                <ProjectPixel name="pidge" />
+                <div className="project-content">
+                <h3><a className="project-destination" href="https://pidge.watch">pidge.watch <span aria-hidden="true">↗</span></a></h3>
+                <p className="project-promise">Tell us what Oxford role you want. Know when it appears.</p>
+                <p className="project-summary">One search across Oxford’s scattered opportunities, with alerts when something matches.</p>
+                </div>
               </li>
-              <li>
-                <h3><a href="https://github.com/KabakaWilliam/trajectorykit">TrajectoryKit</a></h3>
-                <p className="project-summary">Tools for running agents locally and inspecting their turns, tool calls, and sub-agent traces.</p>
-                <p className="project-note"><span aria-hidden="true">🏆</span> Reached #6 on DeepResearch Bench. <Link href="/blog/building-trajectorykit">How we built it</Link>.</p>
+              <li className="project-feature">
+                <ProjectPixel name="terminal" />
+                <div className="project-content">
+                <h3><a className="project-destination" href="https://github.com/KabakaWilliam/trajectorykit">TrajectoryKit <span aria-hidden="true">↗</span></a></h3>
+                <p className="project-promise">Run agents locally. See what they do.</p>
+                <p className="project-summary">Inspect turns, tool calls, and sub-agent traces to understand how a run unfolds.</p>
+                <div className="project-note">
+                  <span><span aria-hidden="true">🏆</span> #6 on DeepResearch Bench</span>
+                  <Link className="project-story" href="/blog/building-trajectorykit">How we built it</Link>
+                </div>
+                </div>
               </li>
             </ul>
           </section>
@@ -84,8 +99,12 @@ export default function Home() {
               <h2 id="writing-title">Writing</h2>
               <Link href="/blog">All posts</Link>
             </div>
-            <p className="writing-title"><Link href="/blog/building-trajectorykit">We Built a Competitive Deep Research Agent Without Fine-Tuning</Link></p>
-            <p className="paper-meta"><time dateTime="2026-03-23">March 2026</time> · Harness design, a 20B model, and what the numbers might be hiding.</p>
+            <article className="writing-entry" aria-labelledby="trajectorykit-essay-title">
+              <time dateTime="2026-03-23">March 2026</time>
+              <h3 className="writing-title" id="trajectorykit-essay-title"><Link href="/blog/building-trajectorykit">We Built a Competitive Deep Research Agent Without Fine-Tuning</Link></h3>
+              <p className="writing-summary">Harness design, a 20B model, and what the numbers might be hiding.</p>
+              <Link className="writing-read" href="/blog/building-trajectorykit" aria-label="Read essay: We Built a Competitive Deep Research Agent Without Fine-Tuning">Read essay <span aria-hidden="true">→</span></Link>
+            </article>
           </section>
 
           <section id="news" aria-labelledby="news-title">
@@ -99,7 +118,7 @@ export default function Home() {
           </section>
         </main>
 
-        <footer id="contact">Working on agents, or building something useful in Oxford? <a href="mailto:william.lugoloobi@oii.ox.ac.uk">I'd love to hear from you</a>.</footer>
+        <footer id="contact">Building something cool? <a href="mailto:william.lugoloobi@oii.ox.ac.uk">I'd love to hear from you</a>.</footer>
         <span id="portrait-status" className="sr-only" role="status"></span>
         <dialog className="portrait-dialog" aria-labelledby="game-title" aria-describedby="game-instructions">
           <div className="game-header">
