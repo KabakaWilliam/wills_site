@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="William Lugoloobi — reliable AI agents, model self-knowledge, and post-training at Oxford.">
+  <title>William Lugoloobi — academic preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #343834;
+      --heading: #252e29;
+      --secondary: #4e574f;
+      --muted: #626760;
+      --link: #3b6258;
+      --paper: #faf9f6;
+      --rule: #d9ddd5;
+      --font-reading: Georgia, "Times New Roman", serif;
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --space-section: 48px;
+      --space-entry: 28px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 24px; }
+    body {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 64px 32px 48px;
+      background: var(--paper);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    a { color: var(--link); text-decoration-color: #a9b8af; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    a:hover { color: #234b3f; text-decoration-color: currentColor; }
+    a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-offset: 5px; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h3, .writing-title { font-family: var(--font-reading); font-weight: 400; }
+    h1 { color: var(--heading); font-size: 38px; line-height: 1.25; letter-spacing: -.6px; }
+    h2 { color: var(--heading); font-family: var(--font-ui); font-size: 23px; line-height: 1.35; font-weight: 650; margin-bottom: 24px; letter-spacing: -.5px; }
+    h3 { font-size: 21px; line-height: 1.5; }
+    p + p { margin-top: 18px; }
+    header { margin-bottom: 32px; }
+    .identity { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .affiliation { margin-top: 8px; color: var(--muted); font-size: 16px; }
+    nav { display: flex; align-items: center; gap: 28px; margin-top: 24px; border-bottom: 1px solid var(--rule); font-size: 15px; }
+    nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 0; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--secondary); font-weight: 500; line-height: 1.4; text-decoration: none; white-space: nowrap; }
+    nav a:hover { color: var(--heading); border-bottom-color: #bfc7bd; }
+    nav a[aria-current="location"] { color: var(--heading); border-bottom-color: #ac9466; }
+    nav .nav-cv { margin-left: auto; gap: 8px; }
+    .nav-cv span { color: #858778; font-weight: 400; }
+    .portrait-wrap { flex: 0 0 auto; width: 100px; text-align: center; }
+    .portrait { display: block; width: 100%; aspect-ratio: 1; border: 0; border-radius: 50%; padding: 0; background: transparent; cursor: pointer; perspective: 650px; -webkit-tap-highlight-color: transparent; }
+    .portrait-inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 520ms cubic-bezier(.22,.75,.25,1); }
+    .portrait[data-photo="true"] .portrait-inner { transform: rotateY(180deg); }
+    .portrait-face { position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 50%; background: var(--paper); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .portrait-face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .portrait-illustration img { transform: scale(1.35); mix-blend-mode: multiply; }
+    .portrait-photo { transform: rotateY(180deg); }
+    .portrait-photo img { object-position: center 30%; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    .section-intro { color: var(--secondary); margin: -10px 0 24px; font-size: 18px; }
+    .lead { color: var(--heading); font-size: 20px; font-weight: 500; margin-bottom: 18px; }
+    .elsewhere { display: flex; flex-wrap: wrap; gap: 8px 23px; margin-top: 23px; font-size: 16px; }
+    .elsewhere a { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; white-space: nowrap; }
+    .profile-pixel { width: 16px; height: 16px; flex: 0 0 16px; shape-rendering: crispEdges; }
+    .pixel-mail { color: #886c36; }
+    .pixel-scholar { color: #446959; }
+    .pixel-github { color: #716080; }
+    .pixel-linkedin { color: #4f7390; }
+    .pixel-x { color: #535953; }
+    section + section { margin-top: var(--space-section); padding-top: 28px; border-top: 1px solid var(--rule); }
+    .section-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0 16px; }
+    .section-heading > a { font-size: 15px; margin-bottom: 24px; }
+    .papers, .projects, .updates { list-style: none; margin: 0; padding: 0; }
+    .papers li + li, .projects li + li { margin-top: var(--space-entry); }
+    h3 a, .writing-title a { color: var(--link); text-decoration: none; }
+    h3 a:hover, .writing-title a:hover { text-decoration: underline; }
+    .papers h3 { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 16px; }
+    .venue-label { display: inline-block; margin-top: 5px; padding: 3px 9px; border: 1px solid #c99a39; border-radius: 4px; background: linear-gradient(135deg, #fff0bb, #edcd73); color: #674514; box-shadow: inset 0 1px 0 #fff8df; font: 650 12px/1.5 var(--font-ui); letter-spacing: .02em; white-space: nowrap; }
+    .venue-label--preprint { border-color: #dedfd9; background: #efefeb; color: #5c6059; box-shadow: none; text-shadow: none; font-weight: 600; }
+    .paper-meta { color: var(--muted); font-size: 15px; line-height: 1.6; margin-top: 5px; }
+    .paper-authors { margin-top: 7px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .paper-authors strong { color: var(--secondary); font-weight: 700; }
+    .paper-summary { color: var(--secondary); margin-top: 9px; font-size: 17px; line-height: 1.7; }
+    .project-summary { color: var(--secondary); margin-top: 8px; font-size: 17px; line-height: 1.7; }
+    .project-note { margin-top: 10px; color: var(--muted); font-size: 16px; }
+    .writing-title { font-size: 21px; line-height: 1.5; }
+    .updates li { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 20px; font-size: 17px; }
+    .updates li + li { margin-top: 16px; }
+    time { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+    footer { border-top: 1px solid var(--rule); margin-top: var(--space-section); padding-top: 24px; font-size: 16px; color: var(--muted); }
+    @media (max-width: 560px) {
+      body { padding: 32px 24px; font-size: 18px; line-height: 1.7; }
+      h1 { font-size: 30px; }
+      h2 { font-size: 22px; }
+      .affiliation { font-size: 15px; }
+      header { margin-bottom: 28px; }
+      .identity { gap: 16px; }
+      .portrait-wrap { width: 70px; }
+      nav { justify-content: space-between; gap: 10px; font-size: 14px; }
+      nav .nav-cv { margin-left: 0; gap: 5px; }
+      .elsewhere { gap: 4px 20px; }
+      .elsewhere a { min-height: 44px; }
+      :root { --space-section: 40px; }
+      section + section { padding-top: 24px; }
+      .updates li { grid-template-columns: 1fr; gap: 2px; }
+      .papers h3 { display: block; }
+      .venue-label { display: table; margin-top: 8px; }
+    }
+    @media (max-width: 360px) {
+      body { padding-inline: 18px; }
+      h1 { font-size: 28px; }
+      .portrait-wrap { width: 60px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .portrait-inner { transition: none; }
+      .portrait[data-photo="true"] .portrait-inner, .portrait-photo { transform: none; }
+      .portrait-photo { visibility: hidden; }
+      .portrait[data-photo="true"] .portrait-photo { visibility: visible; }
+      .portrait[data-photo="true"] .portrait-illustration { visibility: hidden; }
+    }
+    @media print {
+      body { max-width: none; padding: 0; font-size: 11pt; }
+      nav { display: none; }
+      section, .papers li { break-inside: avoid; }
+      a { color: inherit; }
+      .portrait-dialog { display: none; }
+    }
+  </style>
+  <link rel="stylesheet" href="gpu-runner.css">
+</head>
+<body>
+  <header>
+    <div class="identity">
+      <div>
+        <h1>William Lugoloobi</h1>
+        <p class="affiliation">PhD student · Oxford Internet Institute</p>
+      </div>
+      <div class="portrait-wrap">
+        <button class="portrait" type="button" aria-label="Play William’s GPU quest" aria-haspopup="dialog" data-photo="false">
+          <span class="portrait-inner" aria-hidden="true">
+            <span class="portrait-face portrait-illustration"><img src="note_hero.png" width="100" height="100" alt=""></span>
+            <span class="portrait-face portrait-photo"><img src="hero_pic.jpg" width="100" height="100" alt=""></span>
+          </span>
+        </button>
+      </div>
+    </div>
+    <nav aria-label="Page navigation">
+      <a href="#research">Research</a>
+      <a href="#projects">Projects</a>
+      <a href="#writing">Writing</a>
+      <a href="#news">News</a>
+      <a class="nav-cv" href="/cv">CV <span aria-hidden="true">→</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="bio" aria-label="About William">
+      <p class="lead">I train and build reliable AI agents.</p>
+      <p>I'm a third-year PhD student at the <a href="https://www.oii.ox.ac.uk/">Oxford Internet Institute</a>, advised by <a href="https://www.oii.ox.ac.uk/people/profiles/joss-wright/">Joss Wright</a> and <a href="https://www.oii.ox.ac.uk/people/profiles/chris-russell/">Chris Russell</a>. I study what models know about their own capabilities. I use that knowledge to make agents more reliable on long-horizon tasks.</p>
+      <p>I'm also a Research Scientist Intern at <a href="https://www.thomsonreuters.com/en/artificial-intelligence/ai-overview">Thomson Reuters</a>, working on post-training and harness optimisation for agents.</p>
+      <div class="elsewhere" aria-label="Contact and profiles">
+        <a href="mailto:william.lugoloobi@oii.ox.ac.uk">
+          <svg class="profile-pixel pixel-mail" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M1 3h14v10H1z"/>
+            <path fill="#faedbd" d="M2 4h12v8H2z"/>
+            <path fill="currentColor" d="M2 4h2v2H2zm2 2h2v2H4zm2 2h4v2H6zm4-2h2v2h-2zm2-2h2v2h-2z"/>
+          </svg><span>Email</span>
+        </a>
+        <a href="https://scholar.google.com/citations?user=_lcpYZkAAAAJ&amp;hl=en">
+          <svg class="profile-pixel pixel-scholar" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M6 2h4v1h2v1h2v1h2v2h-2v1h-2v1h-2v1H6V9H4V8H2V7H0V5h2V4h2V3h2zM3 10h3v1h4v-1h3v3h-2v1H5v-1H3z"/>
+            <path fill="#d4ad59" d="M7 5h2v2H7zm7 3h1v3h1v3h-3v-3h1z"/>
+          </svg><span>Google Scholar</span>
+        </a>
+        <a href="https://github.com/KabakaWilliam">
+          <svg class="profile-pixel pixel-github" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M2 1h3v2h6V1h3v7h-1v2h-2v2h1v3H5v-2H3v-1H1v-2h2v1h3v-1H3V8H2z"/>
+            <path fill="#eee5f0" d="M4 5h8v3h-1v1H5V8H4z"/>
+            <path fill="currentColor" d="M5 5h1v2H5zm5 0h1v2h-1z"/>
+          </svg><span>GitHub</span>
+        </a>
+        <a href="https://www.linkedin.com/in/wlugoloobi/">
+          <svg class="profile-pixel pixel-linkedin" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M2 1h12v1h1v12h-1v1H2v-1H1V2h1z"/>
+            <path fill="#f5f8f6" d="M4 4h2v2H4zm0 3h2v5H4zm4 0h2v1h1V7h1v1h1v4h-2V9h-1v3H8z"/>
+          </svg><span>LinkedIn</span>
+        </a>
+        <a href="https://x.com/William__Gitta">
+          <svg class="profile-pixel pixel-x" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M2 2h3v2H2zm3 2h2v2H5zm2 2h2v2H7zm2 2h2v2H9zm2 2h2v2h-2zm2 2h2v2h-2zM12 2h2v2h-2zm-2 2h2v2h-2zM6 8h2v2H6zm-2 2h2v2H4zm-2 2h2v2H2z"/>
+          </svg><span>X</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="research" aria-labelledby="research-title">
+      <div class="section-heading">
+        <h2 id="research-title">Selected research</h2>
+        <a href="https://scholar.google.com/citations?user=_lcpYZkAAAAJ&amp;hl=en">All publications</a>
+      </div>
+      <ul class="papers">
+        <li>
+          <h3><a href="https://arxiv.org/abs/2605.14786">Known By Their Actions: Fingerprinting LLM Browser Agents via UI Traces</a> <span class="venue-label">NeurIPS ’26</span></h3>
+          <p class="paper-authors"><strong>William Lugoloobi</strong>, Samuelle Marro, Jabez Magomere, Joss Wright, Chris Russell</p>
+          <p class="paper-summary">Websites can identify the model behind a browser agent by observing its actions.</p>
+        </li>
+        <li>
+          <h3><a href="https://arxiv.org/abs/2602.09924">LLMs Encode Their Failures: Predicting Success from Pre-Generation Activations</a> <span class="venue-label">COLM ’26</span></h3>
+          <p class="paper-authors"><strong>William Lugoloobi</strong>, Thomas Foster, William Bankes, Chris Russell</p>
+          <p class="paper-summary">Predicting whether a model will succeed before it starts generating, and using that signal to route inference.</p>
+        </li>
+        <li>
+          <h3><a href="https://arxiv.org/abs/2510.18147">LLMs Encode How Difficult Problems Are</a> <span class="venue-label venue-label--preprint">Preprint ’25</span></h3>
+          <p class="paper-authors"><strong>William Lugoloobi</strong>, Chris Russell</p>
+          <p class="paper-summary">Language models represent the difficulty of maths and coding problems in their activations.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="projects" aria-labelledby="projects-title">
+      <h2 id="projects-title">Things I'm building</h2>
+      <p class="section-intro">I also build things I wish existed.</p>
+      <ul class="projects">
+        <li>
+          <h3><a href="https://pidge.watch">pidge.watch</a></h3>
+          <p class="project-summary">Tell us what Oxford role you want. Know when it appears.</p>
+          <p class="project-summary">Oxford jobs are scattered across college sites. Pidge brings them together and alerts you when a matching opportunity appears.</p>
+        </li>
+        <li>
+          <h3><a href="https://github.com/KabakaWilliam/trajectorykit">TrajectoryKit</a></h3>
+          <p class="project-summary">Tools for running agents locally and inspecting their turns, tool calls, and sub-agent traces.</p>
+          <p class="project-note"><span aria-hidden="true">🏆</span> Reached #6 on DeepResearch Bench. <a href="/blog/building-trajectorykit">How we built it</a>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="writing" aria-labelledby="writing-title">
+      <div class="section-heading">
+        <h2 id="writing-title">Writing</h2>
+        <a href="/blog">All posts</a>
+      </div>
+      <p class="writing-title"><a href="/blog/building-trajectorykit">We Built a Competitive Deep Research Agent Without Fine-Tuning</a></p>
+      <p class="paper-meta"><time datetime="2026-03-23">March 2026</time> · Harness design, a 20B model, and what the numbers might be hiding.</p>
+    </section>
+
+    <section id="news" aria-labelledby="news-title">
+      <h2 id="news-title">News</h2>
+      <ul class="updates">
+        <li><time datetime="2026-10">Oct 2026</time><p><a href="https://arxiv.org/abs/2605.14786">Known By Their Actions</a> accepted to NeurIPS.</p></li>
+        <li><time datetime="2026-08">Aug 2026</time><p><a href="https://arxiv.org/abs/2602.09924">LLMs Encode Their Failures</a> accepted to COLM.</p></li>
+        <li><time datetime="2026-08-03">3 Aug 2026</time><p>Joined Thomson Reuters as a Research Scientist Intern.</p></li>
+        <li><time datetime="2026-07">Jul 2026</time><p>Launched <a href="https://pidge.watch">Pidge</a> for finding and following Oxford opportunities.</p></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>Working on agents, or building something useful in Oxford? <a href="mailto:william.lugoloobi@oii.ox.ac.uk">I'd love to hear from you</a>.</footer>
+  <span id="portrait-status" class="sr-only" role="status"></span>
+  <dialog class="portrait-dialog" aria-labelledby="game-title" aria-describedby="game-instructions">
+    <div class="game-header">
+      <div><span class="game-eyebrow">A small side quest</span><h2 id="game-title">GPU quest</h2></div>
+      <form method="dialog"><button class="game-close" aria-label="Close game">×</button></form>
+    </div>
+    <div class="game-hud" aria-label="Score">
+      <span>GPUs <strong id="gpu-count">00</strong></span>
+      <span><strong id="game-distance">0</strong> m</span>
+      <span>Best <strong id="game-best">00</strong></span>
+    </div>
+    <div class="game-screen">
+      <canvas id="gpu-game" width="480" height="272" aria-label="Pixel William runs along a path. Jump over holes and angry deadline clocks, double jump in midair, and collect green GPUs.">This game needs a browser with canvas support.</canvas>
+      <div class="game-overlay" id="game-overlay">
+        <span class="game-badge" id="game-badge">OXFORD · COMPUTE HUNT</span>
+        <h3 id="game-message">Just one more GPU.</h3>
+        <p id="game-detail">Collect compute. Dodge deadlines.<br>Tap again in the air to double jump.</p>
+        <button id="game-start" class="game-primary" autofocus>Let’s go →</button>
+      </div>
+    </div>
+    <div class="game-controls">
+      <button id="game-jump" class="game-primary" disabled>Jump <span aria-hidden="true">↑</span></button>
+      <button id="game-pause" disabled>Pause</button>
+    </div>
+    <p id="game-instructions" class="game-instructions">Tap / Space / ↑ to jump · Again in midair to double jump</p>
+    <p class="game-footnote">All GPUs ethically foraged. No grants were harmed.</p>
+    <span id="game-status" class="sr-only" role="status"></span>
+  </dialog>
+  <script src="gpu-runner-preview.js" type="module"></script>
+  <script>
+    // A quiet location marker, including when readers scroll rather than click.
+    const sectionLinks = [...document.querySelectorAll('nav a[href^="#"]')];
+    const navSections = sectionLinks.map(link => document.querySelector(link.hash));
+    let navFrame = 0;
+    function updateNavigation() {
+      navFrame = 0;
+      let current = null;
+      for (const section of navSections) {
+        if (section.getBoundingClientRect().top <= window.innerHeight * .25) current = section.id;
+      }
+      if (current && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+        current = navSections[navSections.length - 1].id;
+      }
+      for (const link of sectionLinks) {
+        if (link.hash === '#' + current) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    }
+    function scheduleNavigation() {
+      if (!navFrame) navFrame = requestAnimationFrame(updateNavigation);
+    }
+    window.addEventListener('scroll', scheduleNavigation, { passive: true });
+    window.addEventListener('resize', scheduleNavigation);
+    window.addEventListener('hashchange', scheduleNavigation);
+    window.addEventListener('load', scheduleNavigation);
+    updateNavigation();
+  </script>
+</body>
+</html>

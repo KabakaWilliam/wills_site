@@ -1,6 +1,7 @@
 "use client";
 
 import { logToNtfy } from "@/app/actions";
+import { ProfileLinks } from "@/components/profile-links";
 
 export function Hero() {
   return (
@@ -28,8 +29,8 @@ export function Hero() {
               >
                 Chris Russell
               </a>
-              . My research spans model self-knowledge, post-training, and
-              harness optimisation for long-horizon agents. I&apos;m currently a
+              . I study what models know about their own capabilities. I use that
+              knowledge to make agents more reliable on long-horizon tasks. I&apos;m currently a
               Research Scientist Intern at {" "}
               <a href="https://www.thomsonreuters.com/en/artificial-intelligence/ai-overview"
               target="_blank">
@@ -39,9 +40,8 @@ export function Hero() {
             </p>
             <div className="hero-actions">
               <a href="#research">Selected publications ↓</a>
-              <a href="https://scholar.google.com/citations?user=_lcpYZkAAAAJ&hl=en" target="_blank" rel="noreferrer">Google Scholar ↗</a>
-              <a href="https://github.com/KabakaWilliam" target="_blank" rel="noreferrer">GitHub ↗</a>
             </div>
+            <ProfileLinks />
           </div>
           <div className="academic-portrait">
             {/* eslint-disable-next-line @next/next/no-img-element */}

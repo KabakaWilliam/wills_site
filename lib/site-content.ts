@@ -4,7 +4,11 @@ export const papers = [
       "Known By Their Actions: Fingerprinting LLM Browser Agents via UI Traces",
     abstract:
       "Websites can silently fingerprint which LLM is powering a browser agent just by observing its actions with an embedded tracker.",
-    meta: "arXiv:2605.14786 · Computer-use agents · Security",
+    meta: "NeurIPS 2026 · Computer-use agents · Security",
+    venue: "NeurIPS ’26",
+    preprint: false,
+    authors: ["William Lugoloobi", "Samuelle Marro", "Jabez Magomere", "Joss Wright", "Chris Russell"],
+    summary: "Websites can identify the model behind a browser agent by observing its actions.",
     date: "May 2026",
     href: "https://arxiv.org/abs/2605.14786",
   },
@@ -14,6 +18,10 @@ export const papers = [
     abstract:
       "Language models’ internal representations contain signal about whether they’ll succeed on a task before generation begins. We use it to route inference efficiently while maintaining performance.",
     meta: "COLM 2026 · Mechanistic interpretability · Inference routing",
+    venue: "COLM ’26",
+    preprint: false,
+    authors: ["William Lugoloobi", "Thomas Foster", "William Bankes", "Chris Russell"],
+    summary: "Predicting whether a model will succeed before it starts generating, and using that signal to route inference.",
     date: "Feb 2026",
     href: "https://arxiv.org/abs/2602.09924",
   },
@@ -22,12 +30,23 @@ export const papers = [
     abstract:
       "LLMs linearly represent the difficulty of math and coding problems in their activation space, with implications for adaptive inference, curriculum learning, and model confidence.",
     meta: "arXiv:2510.18147 · Representation learning · Probing",
+    venue: "Preprint ’25",
+    preprint: true,
+    authors: ["William Lugoloobi", "Chris Russell"],
+    summary: "Language models represent the difficulty of maths and coding problems in their activations.",
     date: "Oct 2025",
     href: "https://arxiv.org/abs/2510.18147",
   },
 ] as const;
 
 export const news = [
+  {
+    date: "Oct 2026",
+    title: "Known By Their Actions accepted to NeurIPS",
+    body: "Our work shows that websites can identify the model behind an LLM browser agent by observing its actions.",
+    href: "https://arxiv.org/abs/2605.14786",
+    linkLabel: "Read the paper",
+  },
   {
     date: "Aug 2026",
     title: "LLMs Encode Their Failures accepted to COLM",
