@@ -237,6 +237,7 @@ html:has(.academic-home) { scroll-behavior: auto; }
 .academic-home .intro-landscape {
   position: relative;
   isolation: isolate;
+  overflow: clip;
   margin-inline: -32px;
   padding: 36px 32px 158px;
   background: var(--paper);
@@ -265,6 +266,44 @@ html:has(.academic-home) { scroll-behavior: auto; }
     #faf9f600 calc(100% - 65px));
 }
 .academic-home .intro-reading { position: relative; transition: opacity 380ms ease; }
+/* A bounded trail of separate grains; the reading veil fills itself back in. */
+.academic-home .meadow-dust { display: none; }
+.academic-home .meadow-sand-defs { position: absolute; width: 0; height: 0; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .academic-home .intro-landscape { cursor: pointer; }
+  .academic-home .intro-landscape[data-brushing="true"]::before {
+    mask-image: var(--sand-veil-mask);
+    mask-mode: luminance;
+  }
+  .academic-home .intro-landscape[data-brushing="true"] .intro-reading {
+    mask-image: var(--sand-text-mask);
+    mask-mode: luminance;
+  }
+  .academic-home .meadow-dust {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    contain: strict;
+  }
+  .academic-home .meadow-dust i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 3px;
+    background: #b5934d;
+    opacity: 0;
+  }
+  .academic-home .meadow-dust i:nth-child(3n) { width: 2px; height: 2px; background: #d8ba72; }
+  .academic-home .meadow-dust i:nth-child(3n + 1) { width: 3px; height: 2px; background: #9eac8e; }
+  .academic-home .meadow-dust i:nth-child(6n) { background: #c8a0a0; }
+  .academic-home .meadow-dust i:nth-child(8n)::after {
+    content: ""; position: absolute; width: 1px; height: 5px; left: 1px; top: -1px; background: inherit;
+  }
+}
 .academic-home .intro-landscape[data-scenery="true"]::before,
 .academic-home .intro-landscape[data-scenery="true"] .intro-reading { opacity: 0; }
 .academic-home .intro-landscape[data-scenery="true"] .intro-reading { pointer-events: none; }
@@ -340,6 +379,8 @@ html:has(.academic-home) { scroll-behavior: auto; }
   .academic-home .landscape-return { transition: none; }
 }
 @media print {
+  .academic-home .intro-landscape[data-brushing="true"] .intro-reading { mask-image: none; }
+  .academic-home .meadow-dust { display: none; }
   .academic-home .intro-landscape { margin: 0; padding: 0; }
   .academic-home .intro-landscape[data-scenery="true"] .intro-reading { opacity: 1; }
   .academic-home .landscape-reveal,

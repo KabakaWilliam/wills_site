@@ -3,12 +3,14 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { drawMeadow, meadowStems, oxfordScene } from "@/lib/intro-landscape.mjs";
 import { trackInteraction } from "@/lib/interaction-analytics";
+import { mountMeadowBrush } from "@/lib/meadow-brush.mjs";
 
 type Mode = "auto" | "day" | "night";
 
 export function IntroLandscape({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
+  const revealRef = useRef<HTMLButtonElement>(null);
   const elapsed = useRef(0);
   const readingId = useId();
   const [scenery, setScenery] = useState(false);
@@ -89,6 +91,13 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
     };
   }, [scene, paused, reduced]);
 
+  useEffect(() => {
+    const element = sceneRef.current;
+    const reading = element?.querySelector<HTMLElement>(".intro-reading");
+    if (!element || !reading || scenery || paused || reduced) return;
+    return mountMeadowBrush(element, reading);
+  }, [scenery, paused, reduced]);
+
   const sceneLabel = mode === "auto" ? "Oxford · " + scene : (scene === "day" ? "Day" : "Night") + " preview";
   const changeScenery = (next: boolean) => {
     setScenery(next);
@@ -97,6 +106,16 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
 
   return (
     <div className="intro-landscape" ref={sceneRef} data-scene={scene} data-scenery={scenery}
+      onClick={event => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const target = event.target;
+        if (!(target instanceof Element) || target.closest("a, button, input, select, textarea, [role='button'], [contenteditable], .landscape-controls")) return;
+        // Selecting or copying the introduction should never hide it.
+        if (window.getSelection()?.isCollapsed === false) return;
+        changeScenery(!scenery);
+        // Keep Escape and the existing keyboard-operable toggle available.
+        revealRef.current?.focus({ preventScroll: true });
+      }}
       onKeyDown={event => {
         if (event.key === "Escape" && scenery) {
           event.preventDefault();
@@ -105,7 +124,7 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
       }}>
       <canvas className="intro-landscape-canvas" ref={canvasRef} aria-hidden="true" />
       <div className="intro-reading" id={readingId} inert={scenery} aria-hidden={scenery}>{children}</div>
-      <button className="landscape-reveal" type="button" aria-label="Scenery view"
+      <button className="landscape-reveal" ref={revealRef} type="button" aria-label="Scenery view"
         aria-pressed={scenery} aria-controls={readingId}
         title={scenery ? "Show introduction (or press Escape)" : "Take a moment in the meadow"}
         onClick={() => changeScenery(!scenery)}>
