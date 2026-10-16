@@ -10,7 +10,6 @@ type Mode = "auto" | "day" | "night";
 export function IntroLandscape({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
-  const revealRef = useRef<HTMLButtonElement>(null);
   const elapsed = useRef(0);
   const readingId = useId();
   const [scenery, setScenery] = useState(false);
@@ -105,7 +104,7 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="intro-landscape" ref={sceneRef} data-scene={scene} data-scenery={scenery}
+    <div className="intro-landscape" ref={sceneRef} tabIndex={-1} data-scene={scene} data-scenery={scenery}
       onClick={event => {
         if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const target = event.target;
@@ -113,8 +112,8 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
         // Selecting or copying the introduction should never hide it.
         if (window.getSelection()?.isCollapsed === false) return;
         changeScenery(!scenery);
-        // Keep Escape and the existing keyboard-operable toggle available.
-        revealRef.current?.focus({ preventScroll: true });
+        // Escape still works, without focusing the expanding invisible button.
+        sceneRef.current?.focus({ preventScroll: true });
       }}
       onKeyDown={event => {
         if (event.key === "Escape" && scenery) {
@@ -124,11 +123,16 @@ export function IntroLandscape({ children }: { children: ReactNode }) {
       }}>
       <canvas className="intro-landscape-canvas" ref={canvasRef} aria-hidden="true" />
       <div className="intro-reading" id={readingId} inert={scenery} aria-hidden={scenery}>{children}</div>
-      <button className="landscape-reveal" ref={revealRef} type="button" aria-label="Scenery view"
+      <button className="landscape-reveal" type="button" aria-label="Scenery view"
         aria-pressed={scenery} aria-controls={readingId}
         title={scenery ? "Show introduction (or press Escape)" : "Take a moment in the meadow"}
-        onClick={() => changeScenery(!scenery)}>
-        <span className="landscape-return" aria-hidden="true">↩ Back to introduction</span>
+        onClick={event => {
+          changeScenery(!scenery);
+          // Pointer clicks use the scene as a neutral focus target; keyboard
+          // activation keeps focus on the toggle and its compact visible label.
+          if (event.detail > 0) sceneRef.current?.focus({ preventScroll: true });
+        }}>
+        <span className="landscape-return" aria-hidden="true">{scenery ? "↩ Back to introduction" : "View the meadow →"}</span>
       </button>
       <div className="landscape-controls" aria-label="Landscape controls">
         <button type="button" aria-label={"Scene: " + sceneLabel + ". Change scene"}

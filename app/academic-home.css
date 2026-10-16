@@ -319,7 +319,15 @@ html:has(.academic-home) { scroll-behavior: auto; }
   cursor: pointer;
   touch-action: manipulation;
 }
-.academic-home .landscape-reveal:focus-visible { outline-offset: -6px; }
+/* Pointer focus rests on the scene solely for Escape handling, not as a UI control. */
+.academic-home .intro-landscape:focus { outline: none; }
+/* Keyboard users get a compact labelled focus cue, never a scene-sized rectangle. */
+.academic-home .landscape-reveal:focus-visible { outline: none; }
+.academic-home .landscape-reveal:focus-visible .landscape-return {
+  opacity: 1;
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
 .academic-home .intro-landscape[data-scenery="true"] .landscape-reveal { top: 0; height: auto; }
 .academic-home .landscape-return {
   position: absolute;
